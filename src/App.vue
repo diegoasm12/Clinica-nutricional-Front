@@ -1,85 +1,130 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+  <div class="outer-container">
+    <div class="main-layout">
+      <div class="left-logo">
+        <img alt="Nutri logo" class="logo" src="@/assets/logo.png" />
+        <h1 class="app-title">NutriPro</h1>
+      </div>
+      <div class="right-content">
+        <RouterView />
+      </div>
     </div>
-  </header>
-
-  <RouterView />
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+/* Fondo general */
+.outer-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: url('@/assets/background.png') no-repeat center center;
+  background-size: cover;
+  padding: 1rem;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
+/* Contenedor principal */
+.main-layout {
+  display: flex;
   width: 100%;
-  font-size: 12px;
+  max-width: 1200px;
+  min-height: 80vh;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  flex-wrap: wrap;
+}
+
+/* Lado izquierdo - Logo */
+.left-logo {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
   text-align: center;
-  margin-top: 2rem;
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
+.app-title {
+  margin-top: 1.5rem;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  color: #2c3e50;
+  font-weight: 700;
 }
 
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
+/* Logo */
+.logo {
+  width: min(70%, 300px);
+  height: auto;
+  object-fit: contain;
 }
 
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
+/* Lado derecho - Formulario */
+.right-content {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .main-layout {
+    flex-direction: column;
+    min-height: auto;
   }
-
+  
+  .left-logo, .right-content {
+    width: 100%;
+    padding: 1.5rem;
+  }
+  
+  .left-logo {
+    padding-bottom: 0;
+  }
+  
   .logo {
-    margin: 0 2rem 0 0;
+    max-width: 200px;
   }
+}
 
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
+@media (max-width: 480px) {
+  .outer-container {
+    padding: 0;
+    align-items: flex-start;
   }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
+  
+  .main-layout {
+    border-radius: 0;
+    min-height: 100vh;
+  }
+  
+  .left-logo, .right-content {
+    padding: 1rem;
+  }
+  
+  .app-title {
     margin-top: 1rem;
   }
 }
 </style>
+
+        <!-- <HelloWorld msg="You did it!" /> -->
+
+      <!-- <nav>
+        <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/login">login</RouterLink>
+      </nav> -->
+
