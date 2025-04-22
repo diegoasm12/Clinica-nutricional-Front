@@ -7,7 +7,6 @@ import { RouterView } from 'vue-router'
     <div class="main-layout">
       <div class="left-logo">
         <img alt="Nutri logo" class="logo" src="@/assets/logo.png" />
-        <h1 class="app-title">NutriPro</h1>
       </div>
       <div class="right-content">
         <RouterView />
@@ -17,60 +16,53 @@ import { RouterView } from 'vue-router'
 </template>
 
 <style scoped>
-/* Fondo general */
+/* Fondo general que ocupa toda la pantalla */
 .outer-container {
   display: flex;
-  justify-content: center;
+  /* justify-content: center; */
   align-items: center;
   min-height: 100vh;
+  width: 100vw;
   background: url('@/assets/background.png') no-repeat center center;
   background-size: cover;
-  padding: 1rem;
+  padding: 0;
+  margin: 0;
 }
 
-/* Contenedor principal */
+/* Contenedor principal que ocupa el 90% del viewport */
 .main-layout {
   display: flex;
-  width: 100%;
-  max-width: 1200px;
-  min-height: 80vh;
+  flex-direction: row;
+  width: 90vw;
+  height: 90vh;
+  max-width: 1400px;
   border-radius: 20px;
   background-color: rgba(255, 255, 255, 0.85);
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
   overflow: hidden;
-  flex-wrap: wrap;
 }
 
 /* Lado izquierdo - Logo */
 .left-logo {
-  flex: 1;
-  min-width: 300px;
+  width: 50%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  text-align: center;
 }
 
-.app-title {
-  margin-top: 1.5rem;
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
-  color: #2c3e50;
-  font-weight: 700;
-}
-
-/* Logo */
+/* Logo responsivo */
 .logo {
-  width: min(70%, 300px);
+  max-width: 80%;
+  max-height: 80%;
+  width: auto;
   height: auto;
   object-fit: contain;
 }
 
-/* Lado derecho - Formulario */
+/* Lado derecho - Formulario (ocupa todo el espacio disponible) */
 .right-content {
-  flex: 1;
-  min-width: 300px;
+  width: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,53 +70,40 @@ import { RouterView } from 'vue-router'
   background-color: rgba(255, 255, 255, 0.9);
 }
 
-/* Estilos responsivos */
+/* Responsive para móviles */
 @media (max-width: 768px) {
+  .outer-container {
+    padding: 0;
+  }
+  
   .main-layout {
     flex-direction: column;
-    min-height: auto;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
   }
   
   .left-logo, .right-content {
     width: 100%;
-    padding: 1.5rem;
-  }
-  
-  .left-logo {
-    padding-bottom: 0;
-  }
-  
-  .logo {
-    max-width: 200px;
-  }
-}
-
-@media (max-width: 480px) {
-  .outer-container {
-    padding: 0;
-    align-items: flex-start;
-  }
-  
-  .main-layout {
-    border-radius: 0;
-    min-height: 100vh;
-  }
-  
-  .left-logo, .right-content {
+    height: 50%;
     padding: 1rem;
   }
   
-  .app-title {
-    margin-top: 1rem;
+  .left-logo {
+    justify-content: center;
+  }
+  
+  .right-content {
+    justify-content: flex-start;
+    padding-top: 0;
   }
 }
 </style>
 
-        <!-- <HelloWorld msg="You did it!" /> -->
+<!-- <HelloWorld msg="You did it!" /> -->
 
       <!-- <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
         <RouterLink to="/login">login</RouterLink>
       </nav> -->
-
