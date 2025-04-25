@@ -24,6 +24,12 @@
           required
         />
       </div>
+
+      <div class="recover-password-wrapper">
+        <RouterLink to="/forgot-password" class="forgot-password-link">
+          ¿Olvidaste tu contraseña?
+        </RouterLink>
+      </div>
       
       <div class="form-divider"></div>
       
@@ -133,6 +139,24 @@ export default {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
+
+.recover-password-wrapper {
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.forgot-password-link {
+  color: #b35fc3;
+  font-size: 0.9rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
 
 /* Responsive para móviles */
 @media (max-width: 768px) {

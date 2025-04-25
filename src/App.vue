@@ -10,8 +10,7 @@ import { RouterView } from 'vue-router'
       </div>
       <div class="right-content">
         <RouterView />
-        <RouterLink to="/login">Login</RouterLink>
-        <RouterLink to="/forgot-password">Recuperar Contraseña</RouterLink>
+        <RouterLink to="/login"></RouterLink>
       </div>
     </div>
   </div>
