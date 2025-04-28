@@ -95,11 +95,6 @@
 
         const userData = { ...formData.value }
         
-
-        if(props.user) {
-          delete userData.password
-        }
-        
         emit('save', userData)
       }
   
