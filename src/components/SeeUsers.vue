@@ -23,9 +23,9 @@
             </select>
           </div>
           
-          <div class="form-group">
+          <div class="form-group" v-if="!user">
             <label>Contraseña</label>
-            <input v-model="formData.password" :type="showPassword ? 'text' : 'password'" :required="!user">
+            <input v-model="formData.password" :type="showPassword ? 'text' : 'password'" required>
             <button type="button" class="toggle-password" @click="showPassword = !showPassword">
               {{ showPassword ? '👁️' : '👁️‍🗨️' }}
             </button>
@@ -56,14 +56,18 @@
         name: '',
         email: '',
         rol: '',
-        password: ''
+        password: '' 
       })
       const showPassword = ref(false)
   
       watch(() => props.user, (newUser) => {
         if(newUser) {
           // Copiar datos del usuario a editar
-          formData.value = { ...newUser }
+          formData.value = { 
+            name: newUser.name,
+            email: newUser.email,
+            rol: newUser.rol
+          }
         } else {
           // Resetear formulario para nuevo usuario
           formData.value = {
@@ -76,17 +80,27 @@
       }, { immediate: true })
   
       const handleSubmit = () => {
+        // Validación de campos requeridos
         if(!formData.value.name || !formData.value.email || !formData.value.rol) {
           alert('Por favor complete todos los campos requeridos')
           return
         }
         
+        // Validación de contraseña creacion
         if(!props.user && !formData.value.password) {
           alert('Por favor ingrese una contraseña')
           return
         }
         
-        emit('save', { ...formData.value })
+
+        const userData = { ...formData.value }
+        
+
+        if(props.user) {
+          delete userData.password
+        }
+        
+        emit('save', userData)
       }
   
       const close = () => {
