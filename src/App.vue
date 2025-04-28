@@ -3,7 +3,7 @@ import { RouterView } from 'vue-router'
 import { ref } from 'vue'
 
 // Variable para en un futuro al tener el jwt sacar el logo y dejar todo el espacio de la página
-const showRouter = ref(true)
+const showRouter = ref(false)
 
 
 const toggleView = () => {
