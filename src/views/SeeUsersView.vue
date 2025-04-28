@@ -7,7 +7,7 @@
       </button>
     </div>
 
-    <div class="users-list">
+    <div v-if="users.length > 0" class="users-list">
       <div v-for="user in users" :key="user.id" class="user-card">
         <div class="user-content">
           <div class="user-info">
@@ -21,6 +21,9 @@
         </div>
       </div>
     </div>
+    <div v-else class="no-users">
+      <p>Cargando usuarios...</p>
+    </div>
 
     <SeeUsers 
       v-if="showForm"
@@ -32,19 +35,49 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import SeeUsers from '@/components/SeeUsers.vue'
+import axios from 'axios'
 
 export default {
   components: { SeeUsers },
   setup() {
     const showForm = ref(false)
     const currentUser = ref(null)
-    const users = ref([
+    const users = ref([])
+    const isLoading = ref(true)
+    
+    // Datos estáticos de respaldo
+    const staticUsers = [
       { id: 1, name: 'Juanito Perez', rol: 'Administrador' },
       { id: 2, name: 'María García', rol: 'Nutriólogo' },
       { id: 3, name: 'Carlos López', rol: 'Nutriólogo' }
-    ])
+    ]
+
+    // Configuración de la API - usa valores por defecto si no hay .env
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || ''
+    const usersEndpoint = import.meta.env.VITE_USERS_ENDPOINT || '/users'
+
+    // Función para cargar usuarios
+    const fetchUsers = async () => {
+      try {
+        // Intenta cargar desde el backend si hay URL configurada
+        if (apiBaseUrl) {
+          const response = await axios.get(`${apiBaseUrl}${usersEndpoint}`)
+          users.value = response.data
+        } else {
+          // Usa datos estáticos si no hay URL configurada
+          console.warn('No hay URL de API configurada')
+          users.value = staticUsers
+        }
+      } catch (error) {
+        console.error('Error al cargar usuarios:', error)
+      } finally {
+        isLoading.value = false
+      }
+    }
+
+    onMounted(fetchUsers)
 
     const openCreateForm = () => {
       currentUser.value = null
@@ -56,14 +89,17 @@ export default {
       showForm.value = true
     }
 
-    const confirmDelete = (id) => {
+    const confirmDelete = async (id) => {
       if(confirm('¿Estás seguro de eliminar este usuario?')) {
-        deleteUser(id)
+        try {
+          if (apiBaseUrl) {
+            await axios.delete(`${apiBaseUrl}${usersEndpoint}/${id}`)
+          }
+        } catch (error) {
+          console.error('Error al eliminar usuario:', error)
+          alert('Error al eliminar usuario')
+        }
       }
-    }
-
-    const deleteUser = (id) => {
-      users.value = users.value.filter(user => user.id !== id)
     }
 
     const closeForm = () => {
@@ -71,30 +107,32 @@ export default {
       currentUser.value = null
     }
 
-    const handleSave = (userData) => {
-      if(userData.id) {
-        // Actualizar usuario existente
-        const index = users.value.findIndex(u => u.id === userData.id)
-        if(index !== -1) {
-          users.value.splice(index, 1, userData)
+    const handleSave = async (userData) => {
+      try {
+        if(userData.id) {
+          // Actualizar usuario
+          if (apiBaseUrl) {
+            await axios.put(`${apiBaseUrl}${usersEndpoint}/${userData.id}`, userData)
+          }
+        } else {
+          // Crear usuario
+          if (apiBaseUrl) {
+            const response = await axios.post(`${apiBaseUrl}${usersEndpoint}`, userData)
+            users.value.push(response.data)
+          }
         }
-      } else {
-        // Crear nuevo usuario
-        const newId = users.value.length > 0 
-          ? Math.max(...users.value.map(u => u.id)) + 1 
-          : 1
-        users.value.push({
-          ...userData,
-          id: newId
-        })
+        closeForm()
+      } catch (error) {
+        console.error('Error al guardar usuario:', error)
+        alert('Error al guardar usuario')
       }
-      closeForm()
     }
 
     return {
       showForm,
       currentUser,
       users,
+      isLoading,
       openCreateForm,
       editUser,
       confirmDelete,
@@ -208,6 +246,12 @@ h1 {
 
 .action-btn.delete:hover {
   background-color: #feb2b2;
+}
+
+.no-users {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
 }
 
 @media (max-width: 768px) {
