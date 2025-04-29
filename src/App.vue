@@ -1,17 +1,30 @@
 <script setup>
 import { RouterView } from 'vue-router'
+import { ref } from 'vue'
+
+// Variable para en un futuro al tener el jwt sacar el logo y dejar todo el espacio de la página
+const showRouter = ref(false)
+
+
+const toggleView = () => {
+  showRouter.value = !showRouter.value
+}
+
 </script>
 
 <template>
   <div class="outer-container">
-    <div class="main-layout">
+    <div v-if="!showRouter" class="main-layout">
       <div class="left-logo">
         <img alt="Nutri logo" class="logo" src="@/assets/logo.png" />
       </div>
       <div class="right-content">
         <RouterView />
-        <RouterLink to="/login"></RouterLink>
       </div>
+    </div>
+    
+    <div v-else class="router-view-only">
+      <RouterView />
     </div>
   </div>
 </template>
