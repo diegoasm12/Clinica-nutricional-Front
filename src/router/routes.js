@@ -1,27 +1,33 @@
 import DashboardLayout from "@/layout/dashboard/DashboardLayout.vue";
-// GeneralViews
 import NotFound from "@/pages/NotFoundPage.vue";
 
-// Admin pages
-const Dashboard = () =>
-  import(/* webpackChunkName: "dashboard" */ "@/pages/Dashboard.vue");
-const Profile = () =>
-  import(/* webpackChunkName: "common" */ "@/pages/Profile.vue");
-const Notifications = () =>
-  import(/* webpackChunkName: "common" */ "@/pages/Notifications.vue");
-const Icons = () =>
-  import(/* webpackChunkName: "common" */ "@/pages/Icons.vue");
-const Maps = () => import(/* webpackChunkName: "common" */ "@/pages/Maps.vue");
-const Typography = () =>
-  import(/* webpackChunkName: "common" */ "@/pages/Typography.vue");
-const TableList = () =>
-  import(/* webpackChunkName: "common" */ "@/pages/TableList.vue");
+// Importación directa para asegurar que el login se cargue inmediatamente
+import LoginView from "@/pages/Login/LoginView.vue";
+
+// Lazy loading para las demás páginas
+const Dashboard = () => import("@/pages/Dashboard.vue");
+const Profile = () => import("@/pages/Profile.vue");
+const Notifications = () => import("@/pages/Notifications.vue");
+const Icons = () => import("@/pages/Icons.vue");
+const Maps = () => import("@/pages/Maps.vue");
+const Typography = () => import("@/pages/Typography.vue");
+const TableList = () => import("@/pages/TableList.vue");
 
 const routes = [
   {
-    path: "/",
+    path: '/',
+    redirect: '/login'
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginView,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: "/admin",
     component: DashboardLayout,
-    redirect: "/dashboard",
+    meta: { requiresAuth: true },
     children: [
       {
         path: "dashboard",
@@ -58,8 +64,14 @@ const routes = [
         name: "table-list",
         component: TableList,
       },
+      // Redirección para rutas no encontradas dentro del dashboard
+      { path: "*", redirect: "/admin/dashboard" }
     ],
   },
+  // { 
+  //   path: "*", 
+  //   redirect: "/login" 
+  // },
   { path: "*", component: NotFound },
 ];
 
