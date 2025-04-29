@@ -1,39 +1,39 @@
 <template>
-  <div class="login-container">
-    <div class="login-form">
-      <h1 class="form-title">INICIE SESIÓN</h1>
+  <div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center p-0">
+    <div class="w-100 bg-white p-4 p-md-5 rounded-4 shadow-lg" style="max-width: 400px">
+      <h1 class="text-center text-dark mb-4 fs-2">INICIE SESIÓN</h1>
       
-      <div class="form-group">
-        <label class="input-label">Correo electrónico</label>
+      <div class="mb-4 w-100">
+        <label class="form-label mb-2 fs-5 fw-medium text-secondary">Correo electrónico</label>
         <input
           type="email"
-          class="form-input"
+          class="form-control py-3 px-4 border border-gray-300 rounded-3"
           placeholder="ejemplo@correo.com"
           v-model="email"
           required
         />
       </div>
       
-      <div class="form-group">
-        <label class="input-label">Contraseña</label>
+      <div class="mb-4 w-100">
+        <label class="form-label mb-2 fs-5 fw-medium text-secondary">Contraseña</label>
         <input
           type="password"
-          class="form-input"
+          class="form-control py-3 px-4 border border-gray-300 rounded-3"
           placeholder="Ingrese su contraseña"
           v-model="password"
           required
         />
       </div>
 
-      <div class="recover-password-wrapper">
-        <RouterLink to="/forgot-password" class="forgot-password-link">
+      <div class="text-center my-3">
+        <RouterLink to="/forgot-password" class="text-decoration-none text-purple fw-medium">
           ¿Olvidaste tu contraseña?
         </RouterLink>
       </div>
       
-      <div class="form-divider"></div>
+      <hr class="my-4 text-gray-300">
       
-      <button class="submit-button" @click="iniciarSesion">
+      <button class="w-100 btn btn-purple py-3 text-white fw-semibold fs-5 rounded-3" @click="iniciarSesion">
         INGRESAR
       </button>
     </div>
@@ -62,125 +62,64 @@ export default {
 </script>
 
 <style scoped>
-/* Contenedor que ocupa todo el espacio disponible */
-.login-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0;
+/* Variables de color personalizadas */
+:root {
+  --bs-purple: #b35fc3;
+  --bs-gray-300: #e2e8f0;
+  --bs-secondary: #4a5568;
 }
 
-/* Formulario que se expande según contenido */
-.login-form {
-  width: 100%;
-  max-width: 400px;
-  padding: 40px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+.rounded-4 {
+  border-radius: 0.75rem !important;
 }
 
-.form-title {
-  color: #2c3e50;
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 2rem;
+/* Clases personalizadas para extender Bootstrap */
+.bg-purple {
+  background-color: var(--bs-purple);
 }
 
-.form-group {
-  margin-bottom: 25px;
-  width: 100%;
+.text-purple {
+  color: var(--bs-purple);
 }
 
-.input-label {
-  display: block;
-  margin-bottom: 10px;
-  font-size: 1.1rem;
-  color: #4a5568;
-  font-weight: 500;
-}
+.btn-purple {
 
-.form-input {
-  width: 100%;
-  padding: 15px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #b35fc3;
-}
-
-.form-divider {
-  height: 1px;
-  background-color: #e2e8f0;
-  margin: 30px 0;
-}
-
-.submit-button {
-  width: 100%;
-  padding: 15px;
-  background-color: #b35fc3;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.submit-button:hover {
   background-color: #9e4fb0;
+  border-color: #9e4fb0;
+}
+
+.btn-purple:hover {
+  background-color: var(--bs-purple);
+  border-color: var(--bs-purple);
+  background-color: #b159c4;
+  border-color: #b159c4;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.recover-password-wrapper {
-  text-align: center;
-  margin-top: 10px;
-  margin-bottom: 20px;
+/* Estilos para el enfoque del input */
+.form-control:focus {
+  border-color: var(--bs-purple);
+  box-shadow: 0 0 0 0.25rem rgba(179, 95, 195, 0.25);
 }
-
-.forgot-password-link {
-  color: #b35fc3;
-  font-size: 0.9rem;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.forgot-password-link:hover {
-  text-decoration: underline;
-}
-
 
 /* Responsive para móviles */
 @media (max-width: 768px) {
-  .login-form {
-    padding: 30px;
-    box-shadow: none;
-    max-width: 100%;
+  .rounded-3 {
+    border-radius: 0.5rem !important;
   }
   
-  .form-title {
-    font-size: 1.8rem;
-    margin-bottom: 25px;
+  .shadow-lg {
+    box-shadow: none !important;
   }
   
-  .form-group {
-    margin-bottom: 20px;
+  .fs-2 {
+    font-size: 1.8rem !important;
   }
   
-  .form-input {
-    padding: 12px;
-  }
-  
-  .submit-button {
-    padding: 12px;
+  .py-3 {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
   }
 }
 </style>
