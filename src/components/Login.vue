@@ -52,7 +52,7 @@ export default {
   methods: {
     iniciarSesion() {
       if (this.email && this.password) {
-        this.$router.push('/');
+        this.$router.push('/dashoard');
       } else {
         alert('Debe ingresar todos los datos.');
       }
