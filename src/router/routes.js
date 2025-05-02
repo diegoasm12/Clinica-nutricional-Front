@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFoundPage.vue";
 // Importación directa para asegurar que el login se cargue inmediatamente
 import LoginView from "@/pages/Login/LoginView.vue";
 import RegisterView from "@/pages/Register/RegisterView.vue";
+import ForgotPasswordView from "@/pages/ForgotPassword/ForgotPasswordView.vue";
 
 // Lazy loading para las demás páginas
 const Dashboard = () => import("@/pages/Dashboard.vue");
@@ -23,6 +24,12 @@ const routes = [
     path: '/login',
     name: 'login',
     component: LoginView,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/forgot-password',
+    name: 'forgotPassword',
+    component: ForgotPasswordView,
     meta: { requiresAuth: false }
   },
   {
