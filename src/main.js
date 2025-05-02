@@ -12,6 +12,7 @@
 
  */
 import Vue from "vue";
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import VueRouter from "vue-router";
 import RouterPrefetch from "vue-router-prefetch";
 import App from "./App";
@@ -24,6 +25,8 @@ import "./registerServiceWorker";
 Vue.use(BlackDashboard);
 Vue.use(VueRouter);
 Vue.use(RouterPrefetch);
+Vue.use(BootstrapVue)
+Vue.use(IconsPlugin)
 new Vue({
   router,
   i18n,
