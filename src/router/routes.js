@@ -6,6 +6,8 @@ import LoginView from "@/pages/Login/LoginView.vue";
 import RegisterView from "@/pages/Register/RegisterView.vue";
 import ForgotPasswordView from "@/pages/ForgotPassword/ForgotPasswordView.vue";
 import SeeUsersView from "../pages/SeeUsers/SeeUsersView.vue";
+import FichaClinica from "../components/FichaClinica.vue";
+import VerFichasClinicas from "../components/VerFichasClinicas.vue";
 
 // Lazy loading para las demás páginas
 const Dashboard = () => import("@/pages/Dashboard.vue");
@@ -83,6 +85,18 @@ const routes = [
         path: "table-list",
         name: "table-list",
         component: TableList,
+      },
+      {
+        path: '/fichaclinica',
+        name: 'fichaclinica',
+        component: FichaClinica,
+        meta: { requiresAuth: false }
+      },
+      {
+        path: '/verfichasclinicas',
+        name: 'verfichasclinicas',
+        component: VerFichasClinicas,
+        meta: { requiresAuth: false }
       },
       // Redirección para rutas no encontradas dentro del dashboard
       { path: "*", redirect: "/admin/dashboard" }
