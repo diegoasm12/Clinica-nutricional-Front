@@ -3,12 +3,12 @@
     <side-bar>
       <template slot="links">
         <sidebar-link
-          to="/fichaclinica"
+          to="/admin/fichaclinica"
           name="Crear Ficha Clinica"
           icon="tim-icons icon-chart-pie-36"
         />
         <sidebar-link
-          to="/verfichasclinicas"
+          to="/admin/verfichasclinicas"
           name="Ver Fichas Clnicas"
           icon="tim-icons icon-atom"
         />
