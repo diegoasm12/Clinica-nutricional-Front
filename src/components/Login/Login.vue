@@ -22,7 +22,7 @@
             <label class="form-label mb-2 fs-5 fw-medium">Correo electrónico</label>
             <input
               type="email"
-              class="form-control py-3 px-4 border border-gray-300 rounded-3"
+              class="form-control text-dark py-3 px-4 border border-gray-300 rounded-3"
               placeholder="ejemplo@correo.com"
               v-model="email"
               required
@@ -33,7 +33,7 @@
             <label class="form-label mb-2 fs-5 fw-medium">Contraseña</label>
             <input
               type="password"
-              class="form-control py-3 px-4 border border-gray-300 rounded-3"
+              class="form-control text-dark py-3 px-4 border border-gray-300 rounded-3"
               placeholder="Ingrese su contraseña"
               v-model="password"
               required
