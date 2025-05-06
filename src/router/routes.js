@@ -5,6 +5,7 @@ import NotFound from "@/pages/NotFoundPage.vue";
 import LoginView from "@/pages/Login/LoginView.vue";
 import RegisterView from "@/pages/Register/RegisterView.vue";
 import ForgotPasswordView from "@/pages/ForgotPassword/ForgotPasswordView.vue";
+import SeeUsersView from "../pages/SeeUsers/SeeUsersView.vue";
 
 // Lazy loading para las demás páginas
 const Dashboard = () => import("@/pages/Dashboard.vue");
@@ -47,6 +48,11 @@ const routes = [
         path: "dashboard",
         name: "dashboard",
         component: Dashboard,
+      },
+      {
+        path: "SeeUsers",
+        name: "SeeUsers",
+        component: SeeUsersView,
       },
       {
         path: "profile",
