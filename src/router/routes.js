@@ -87,13 +87,13 @@ const routes = [
         component: TableList,
       },
       {
-        path: '/fichaclinica',
+        path: 'fichaclinica',
         name: 'fichaclinica',
         component: FichaClinica,
         meta: { requiresAuth: false }
       },
       {
-        path: '/verfichasclinicas',
+        path: 'verfichasclinicas',
         name: 'verfichasclinicas',
         component: VerFichasClinicas,
         meta: { requiresAuth: false }
