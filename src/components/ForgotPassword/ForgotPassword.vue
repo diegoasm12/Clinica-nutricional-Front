@@ -19,7 +19,7 @@
             <div v-if="!emailSent">
               <h1 class="text-center text-dark mb-4 fs-2">RECUPERAR CONTRASEÑA</h1>
               
-              <p class="text-center text-secondary mb-4">
+              <p class="text-center text-secondary mb-4 text-dark">
                 Ingrese su correo electrónico para recibir un enlace de recuperación de contraseña.
               </p>
               
@@ -27,7 +27,7 @@
                 <label class="form-label mb-2 fs-5 fw-medium">Correo electrónico</label>
                 <input
                   type="email"
-                  class="form-control py-3 px-4 border border-gray-300 rounded-3"
+                  class="form-control text-dark py-3 px-4 border border-gray-300 rounded-3"
                   placeholder="Ingrese su correo"
                   v-model="email"
                   required
