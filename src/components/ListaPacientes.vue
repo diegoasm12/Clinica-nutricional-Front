@@ -1,6 +1,9 @@
 <template>
   <div class="pacientes-container">
     <div class="pacientes-content">
+        <div v-if="mostrarNotificacion" class="notificacion" :class="tipoNotificacion">
+            {{ mensajeNotificacion }}
+        </div>
       <h1 class="form-title">Listado de Pacientes</h1>
       
       <div class="form-section">
@@ -73,13 +76,32 @@ export default {
       pacientes: [],
       pacientesFiltrados: [],
       pacienteSeleccionado: null,
-      mostrarModalResumen: false
+      mostrarModalResumen: false,
+      mostrarNotificacion: false,
+      mensajeNotificacion: '',
+      tipoNotificacion: 'info', // puede ser 'info', 'exito', 'error' (porsiacaso)
+      timeoutNotificacion: null
     }
   },
   created() {
     this.cargarPacientes();
   },
   methods: {
+    mostrarNotificacionTemporal(mensaje, tipo = 'info', duracion = 3000) {
+        // Cancelar notificación previa si existe
+        if (this.timeoutNotificacion) {
+        clearTimeout(this.timeoutNotificacion);
+        }
+        
+        this.mostrarNotificacion = true;
+        this.mensajeNotificacion = mensaje;
+        this.tipoNotificacion = tipo;
+        
+        // Ocultar después de la duración especificada
+        this.timeoutNotificacion = setTimeout(() => {
+        this.mostrarNotificacion = false;
+        }, duracion);
+    },
     async cargarPacientes() {
       this.cargando = true;
       try {
@@ -145,11 +167,71 @@ export default {
       this.pacienteSeleccionado = paciente;
       this.mostrarModalResumen = true;
     }
-  }
+  },
+  mounted() {
+    // Mostrar notificación al cargar el componente
+    if (this.pacientes.length > 0) {
+        const ultimoPaciente = this.pacientes[0]; 
+        this.mostrarNotificacionTemporal(
+        `La ficha de ${ultimoPaciente.nombre} ha sido evaluada`,
+        'exito'
+        );
+    }
+    
+    // para paciente específico que fue evaluado ejemplo
+    // this.mostrarNotificacionTemporal(
+    //   `La ficha de María Fernández López ha sido evaluada`,
+    //   'exito'
+    // );
+    }
 }
 </script>
 
 <style scoped>
+.notificacion {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  padding: 15px 25px;
+  border-radius: 5px;
+  color: white;
+  font-weight: 500;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  animation: slideIn 0.5s, fadeOut 0.5s 2.5s forwards;
+}
+
+.notificacion.info {
+  background-color: #4299e1;
+}
+
+.notificacion.exito {
+  background-color: #48bb78;
+}
+
+.notificacion.error {
+  background-color: #f56565;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
 .pacientes-container {
   width: 100%;
   padding: 2rem;
