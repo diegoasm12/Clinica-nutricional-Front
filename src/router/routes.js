@@ -8,6 +8,7 @@ import ForgotPasswordView from "@/pages/ForgotPassword/ForgotPasswordView.vue";
 import SeeUsersView from "../pages/SeeUsers/SeeUsersView.vue";
 import FichaClinica from "../components/FichaClinica.vue";
 import VerFichasClinicas from "../components/VerFichasClinicas.vue";
+import EvaluacionNutricional from "../components/EvaluacionNutricional.vue";
 
 // Lazy loading para las demás páginas
 const Dashboard = () => import("@/pages/Dashboard.vue");
@@ -96,6 +97,12 @@ const routes = [
         path: 'verfichasclinicas',
         name: 'verfichasclinicas',
         component: VerFichasClinicas,
+        meta: { requiresAuth: false }
+      },
+            {
+        path: 'evaluacionNutricional',
+        name: 'evaluacionNutricional',
+        component: EvaluacionNutricional,
         meta: { requiresAuth: false }
       },
       // Redirección para rutas no encontradas dentro del dashboard
