@@ -138,6 +138,7 @@
             <button @click="editarFicha(fichaSeleccionada.id)" class="action-button secondary">Editar ficha</button>
             <button @click="eliminarFicha(fichaSeleccionada.id)" class="action-button danger">Eliminar ficha</button>
             <button @click="mostrarControlPeriodico = true" class="action-button control">Agregar control periódico</button>
+            <button @click="mostrarHistorial = true" class="action-button history">Ver Historial Clínico</button>
             <button @click="closeModal" class="action-button cancel">Cerrar</button>
           </div>
         </div>
@@ -149,12 +150,18 @@
         @control-guardado="actualizarControles"
         @cerrar="mostrarControlPeriodico = false"
       />
+      <HistorialClinico 
+        v-if="mostrarHistorial"
+        :paciente-id="fichaSeleccionada.id"
+        @cerrar="mostrarHistorial = false"
+      />
     </div>
   </div>
 </template>
   
   <script>
   import ControlPeriodico from './ControlPeriodico.vue';
+  import HistorialClinico from '@/components/HistorialClinico.vue';
   export default {
     name: 'BusquedaFichas',
     data() {
@@ -168,7 +175,8 @@
         itemsPorPagina: 6,
         showModal: false,
         fichaSeleccionada: {},
-        mostrarControlPeriodico: false
+        mostrarControlPeriodico: false,
+        mostrarHistorial: false
       }
     },
     computed: {
@@ -209,7 +217,8 @@
       this.cargarDatosEjemplo()
     },
     components: {
-      ControlPeriodico
+      ControlPeriodico,
+      HistorialClinico
     },
     methods: {
       buscarFichas() {
@@ -661,6 +670,15 @@
     background-color: red;
   }
   
+  .action-button.history {
+    background-color: #6b46c1;
+    color: white;
+  }
+
+  .action-button.history:hover {
+    background-color: #553c9a;
+  }
+
   .action-button.control {
     background-color: green;
     color: white;
