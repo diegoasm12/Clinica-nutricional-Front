@@ -24,8 +24,13 @@
         />
         <sidebar-link
           to="/admin/evaluacionNutricional"
-          name="evaluacion Nutricional"
+          name="Evaluacion Nutricional"
           icon="tim-icons icon-chart-pie-36"
+        />
+        <sidebar-link
+          to="/admin/listaPacientes"
+          name="Ver Pacientes"
+          icon="tim-icons icon-pin"
         />
       </template>
     </side-bar>

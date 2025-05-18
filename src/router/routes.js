@@ -9,6 +9,7 @@ import SeeUsersView from "../pages/SeeUsers/SeeUsersView.vue";
 import FichaClinica from "../components/FichaClinica.vue";
 import VerFichasClinicas from "../components/VerFichasClinicas.vue";
 import EvaluacionNutricional from "../components/EvaluacionNutricional.vue";
+import ListaPacientes from "../components/ListaPacientes.vue";
 
 // Lazy loading para las demás páginas
 const Dashboard = () => import("@/pages/Dashboard.vue");
@@ -103,6 +104,12 @@ const routes = [
         path: 'evaluacionNutricional',
         name: 'evaluacionNutricional',
         component: EvaluacionNutricional,
+        meta: { requiresAuth: false }
+      },
+      {
+        path: 'listaPacientes',
+        name: 'listaPacientes',
+        component: ListaPacientes,
         meta: { requiresAuth: false }
       },
       // Redirección para rutas no encontradas dentro del dashboard
