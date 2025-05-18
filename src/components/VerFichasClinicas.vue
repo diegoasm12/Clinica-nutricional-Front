@@ -181,7 +181,15 @@
                 </div>
               </div>
             </div>
+            <div class="detalle-section">
+              <h3>Exportar plan alimenticio</h3>
+              <div>
+                <button @click="exportarPlan(fichaSeleccionada.id)" class="action-button primary">Exportar plan alimenticio</button>
+              </div>
+            </div>
           </div>
+
+          
           
           <div class="modal-footer">
             <button @click="nuevaConsulta(fichaSeleccionada.id)" class="action-button primary">Nueva consulta</button>
@@ -526,6 +534,9 @@ export default {
     },
     eliminarFicha(id) {
       alert(`borrando ficha del paciente ID: ${id}`)
+    },
+    exportarPlan(id) {
+      alert(`Exportando plan alimenticio de ficha con ID: ${id}`)
     },
     actualizarControles(nuevoControl) {
       if (!this.fichaSeleccionada.historial) {
