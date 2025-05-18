@@ -135,6 +135,7 @@
           <div class="modal-footer">
             <button @click="nuevaConsulta(fichaSeleccionada.id)" class="action-button primary">Nueva consulta</button>
             <button @click="editarFicha(fichaSeleccionada.id)" class="action-button secondary">Editar ficha</button>
+            <button @click="eliminarFicha(fichaSeleccionada.id)" class="action-button danger">Eliminar ficha</button>
             <button @click="closeModal" class="action-button cancel">Cerrar</button>
           </div>
         </div>
@@ -420,6 +421,10 @@
         alert(`Editando ficha del paciente ID: ${id}`)
         // Por ejemplo:
         // this.$router.push({ name: 'EditarFicha', params: { pacienteId: id } })
+      },
+      eliminarFicha(id) {
+        alert(`borrando ficha del paciente ID: ${id}`)
+        // this.$router.push({ name: 'EliminarFicha', params: { pacienteId: id } })
       }
     }
   }
@@ -622,6 +627,15 @@
   
   .action-button.secondary:hover {
     background-color: #3182ce;
+  }
+  
+  .action-button.danger {
+    background-color: red;
+    color: white;
+  }
+  
+  .action-button.danger:hover {
+    background-color: red;
   }
   
   .action-button.cancel {
