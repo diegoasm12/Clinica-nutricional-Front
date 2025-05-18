@@ -1,4 +1,5 @@
 <template>
+  <div>
     <div class="busqueda-container">
       <div class="search-header">
         <h2 class="section-title">Búsqueda de Fichas Nutricionales</h2>
@@ -136,14 +137,24 @@
             <button @click="nuevaConsulta(fichaSeleccionada.id)" class="action-button primary">Nueva consulta</button>
             <button @click="editarFicha(fichaSeleccionada.id)" class="action-button secondary">Editar ficha</button>
             <button @click="eliminarFicha(fichaSeleccionada.id)" class="action-button danger">Eliminar ficha</button>
+            <button @click="mostrarControlPeriodico = true" class="action-button control">Agregar control periódico</button>
             <button @click="closeModal" class="action-button cancel">Cerrar</button>
           </div>
         </div>
       </div>
+
+      <ControlPeriodico 
+        v-if="mostrarControlPeriodico"
+        :ficha-id="fichaSeleccionada.id" 
+        @control-guardado="actualizarControles"
+        @cerrar="mostrarControlPeriodico = false"
+      />
     </div>
-  </template>
+  </div>
+</template>
   
   <script>
+  import ControlPeriodico from './ControlPeriodico.vue';
   export default {
     name: 'BusquedaFichas',
     data() {
@@ -156,7 +167,8 @@
         paginaActual: 1,
         itemsPorPagina: 6,
         showModal: false,
-        fichaSeleccionada: {}
+        fichaSeleccionada: {},
+        mostrarControlPeriodico: false
       }
     },
     computed: {
@@ -195,6 +207,9 @@
     mounted() {
       // Cargar datos de ejemplo al iniciar
       this.cargarDatosEjemplo()
+    },
+    components: {
+      ControlPeriodico
     },
     methods: {
       buscarFichas() {
@@ -425,7 +440,15 @@
       eliminarFicha(id) {
         alert(`borrando ficha del paciente ID: ${id}`)
         // this.$router.push({ name: 'EliminarFicha', params: { pacienteId: id } })
-      }
+      },
+      actualizarControles(nuevoControl) {
+        // Aquí actualizas el historial de la ficha seleccionada
+        if (!this.fichaSeleccionada.historial) {
+          this.fichaSeleccionada.historial = [];
+        }
+        this.fichaSeleccionada.historial.push(nuevoControl);
+        this.mostrarControlPeriodico = false;
+      },
     }
   }
   </script>
@@ -638,6 +661,15 @@
     background-color: red;
   }
   
+  .action-button.control {
+    background-color: green;
+    color: white;
+  }
+  
+  .action-button.danger:hover {
+    background-color: green;
+  }
+
   .action-button.cancel {
     background-color: #e2e8f0;
     color: #4a5568;

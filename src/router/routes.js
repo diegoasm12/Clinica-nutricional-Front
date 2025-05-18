@@ -99,7 +99,7 @@ const routes = [
         component: VerFichasClinicas,
         meta: { requiresAuth: false }
       },
-            {
+      {
         path: 'evaluacionNutricional',
         name: 'evaluacionNutricional',
         component: EvaluacionNutricional,

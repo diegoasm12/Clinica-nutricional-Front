@@ -24,7 +24,7 @@
         />
         <sidebar-link
           to="/admin/evaluacionNutricional"
-          name="Gestión de Roles"
+          name="evaluacion Nutricional"
           icon="tim-icons icon-chart-pie-36"
         />
       </template>
