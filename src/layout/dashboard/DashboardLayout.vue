@@ -22,7 +22,11 @@
           name="Gestión de Roles"
           icon="tim-icons icon-pin"
         />
-
+        <sidebar-link
+          to="/admin/evaluacionNutricional"
+          name="Gestión de Roles"
+          icon="tim-icons icon-chart-pie-36"
+        />
       </template>
     </side-bar>
     <div class="main-panel">
