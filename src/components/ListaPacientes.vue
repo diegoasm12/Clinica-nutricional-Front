@@ -97,7 +97,8 @@ export default {
             historial: [
               { fecha: '2023-06-15', tipo: 'control', peso: 57.8 },
               { fecha: '2023-05-20', tipo: 'consulta', peso: 58.3 }
-            ]
+            ],
+            alerta: 'Peso Crítico ⚠️'
           },
           {
             id: 2,
@@ -107,7 +108,8 @@ export default {
             peso: 75.2,
             altura: 175,
             diagnostico: 'Normopeso',
-            imc: 24.5
+            imc: 24.5,
+            alerta: 'Peso estable ✅'
           }
         ];
         this.pacientesFiltrados = [...this.pacientes];

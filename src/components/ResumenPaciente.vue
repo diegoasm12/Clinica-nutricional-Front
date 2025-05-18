@@ -9,6 +9,7 @@
         
         <div class="modal-body">
           <div class="info-paciente">
+            <h3 class="alerta" :class="getAlertaClass(paciente.alerta)">{{ paciente.alerta }}</h3>
             <h3>{{ paciente.nombre }}</h3>
             <p>RUT: {{ paciente.rut }}</p>
           </div>
@@ -123,12 +124,51 @@ export default {
     },
     cerrarHistorial() {
       this.mostrarHistorial = false;
+    },
+    getAlertaClass(alerta) {
+    if (!alerta) return '';
+    
+    alerta = alerta.toLowerCase();
+    
+    if (alerta.includes('crítico') || alerta.includes('urgente') || alerta.includes('peligro')) {
+      return 'alerta-roja';
+    } else if (alerta.includes('estable') || alerta.includes('normal') || alerta.includes('bien')) {
+      return 'alerta-verde';
+    } else if (alerta.includes('atención') || alerta.includes('cuidado') || alerta.includes('observación')) {
+      return 'alerta-amarilla';
     }
+    return '';
+  }
   }
 }
 </script>
 
 <style scoped>
+.alerta {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.alerta-roja {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border-left: 4px solid #b91c1c;
+}
+
+.alerta-verde {
+  background-color: #dcfce7;
+  color: #166534;
+  border-left: 4px solid #166534;
+}
+
+.alerta-amarilla {
+  background-color: #fef9c3;
+  color: #854d0e;
+  border-left: 4px solid #854d0e;
+}
 .modal-overlay {
   position: fixed;
   top: 0;
