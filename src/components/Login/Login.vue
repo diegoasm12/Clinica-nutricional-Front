@@ -69,7 +69,7 @@ export default {
   methods: {
     iniciarSesion() {
       if (this.email && this.password) {
-        this.$router.push('/dashoard');
+        this.$router.push('/admin/verfichasclinicas');
       } else {
         alert('Debe ingresar todos los datos.');
       }
