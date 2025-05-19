@@ -182,10 +182,11 @@
               </div>
             </div>
             <div class="detalle-section">
-              <h3>Exportar plan alimenticio</h3>
-              <div>
-                <button @click="exportarPlan(fichaSeleccionada.id)" class="action-button primary">Exportar plan alimenticio</button>
-              </div>
+              <h3>Exportación de archivos</h3>
+                <div class="botones-container">
+                  <button @click="exportarPlan(fichaSeleccionada.id)" class="action-button primary">Exportar plan alimenticio</button>
+                  <button @click="exportaFicha(fichaSeleccionada.id)" class="action-button primary" style="margin-left: 10px;">Exportar ficha</button>
+                </div>
             </div>
           </div>
 
@@ -538,6 +539,9 @@ export default {
     exportarPlan(id) {
       alert(`Exportando plan alimenticio de ficha con ID: ${id}`)
     },
+    exportarFicha(id) {
+      alert(`Exportando ficha con ID: ${id}`)
+    },
     actualizarControles(nuevoControl) {
       if (!this.fichaSeleccionada.historial) {
         this.fichaSeleccionada.historial = [];
@@ -655,6 +659,18 @@ export default {
   color: #2c3e50;
   font-size: 1.8rem;
   margin: 0;
+}
+
+.botones-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .botones-container {
+    flex-direction: column;
+  }
 }
 
 .search-box {
