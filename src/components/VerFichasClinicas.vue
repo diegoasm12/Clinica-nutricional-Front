@@ -185,7 +185,7 @@
               <h3>Exportación de archivos</h3>
                 <div class="botones-container">
                   <button @click="exportarPlan(fichaSeleccionada.id)" class="action-button primary">Exportar plan alimenticio</button>
-                  <button @click="exportaFicha(fichaSeleccionada.id)" class="action-button primary" style="margin-left: 10px;">Exportar ficha</button>
+                  <button @click="exportarFicha(fichaSeleccionada.id)" class="action-button primary" style="margin-left: 10px;">Exportar ficha</button>
                 </div>
             </div>
           </div>
