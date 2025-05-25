@@ -112,6 +112,13 @@ const routes = [
         component: ListaPacientes,
         meta: { requiresAuth: false }
       },
+      {
+  path: 'fichaclinica/:id/editar',
+  name: 'EditarFicha',
+  component: FichaClinica,
+  meta: { requiresAuth: false }
+},
+
       // Redirección para rutas no encontradas dentro del dashboard
       { path: "*", redirect: "/admin/dashboard" }
     ],

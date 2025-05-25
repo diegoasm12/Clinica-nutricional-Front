@@ -531,7 +531,7 @@ export default {
       alert(`Redirigiendo a nueva consulta para paciente ID: ${id}`)
     },
     editarFicha(id) {
-      alert(`Editando ficha del paciente ID: ${id}`)
+  this.$router.push({ name: 'EditarFicha', params: { id } })
     },
     eliminarFicha(id) {
       alert(`borrando ficha del paciente ID: ${id}`)

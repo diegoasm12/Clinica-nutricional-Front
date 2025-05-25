@@ -1,157 +1,166 @@
 <template>
-    <div class="consulta-container">
-      <form @submit.prevent="handleSubmit" class="consulta-form">
-        <h2 class="form-title">Consulta Nutricional</h2>
-  
-        <!-- 1. Datos del paciente -->
-        <section class="form-section">
-          <h3 class="section-title">Datos del paciente</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <input v-model="form.nombre" placeholder="Nombre completo" required class="form-input" />
-            </div>
-            <div class="form-group">
-              <input v-model="form.rut" placeholder="RUT o ID" required class="form-input" />
-            </div>
-            <div class="form-group">
-              <input v-model.number="form.edad" type="number" placeholder="Edad" required class="form-input" />
-            </div>
-            <div class="form-group">
-              <select v-model="form.sexo" required class="form-input">
-                <option disabled value="">Sexo</option>
-                <option>Femenino</option>
-                <option>Masculino</option>
-                <option>Otro</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <input v-model="form.telefono" placeholder="Teléfono" class="form-input" />
-            </div>
-            <div class="form-group">
-              <input v-model="form.email" placeholder="Correo electrónico" type="email" class="form-input" />
-            </div>
-            <div class="form-group">
-              <input v-model="form.fecha" type="date" class="form-input" />
-            </div>
-          </div>
-        </section>
-  
-        <!-- 2. Datos antropométricos -->
-        <section class="form-section">
-          <h3 class="section-title">Datos antropométricos</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <input v-model.number="form.peso" placeholder="Peso (kg)" type="number" step="0.1" class="form-input" />
-            </div>
-            <div class="form-group">
-              <input v-model.number="form.altura" placeholder="Estatura (cm)" type="number" step="0.1" class="form-input" />
-            </div>
-            <div class="form-group">
-              <input :value="calcularIMC" placeholder="IMC (calculado)" disabled class="form-input disabled" />
-            </div>
-            <div class="form-group">
-              <input v-model.number="form.cintura" placeholder="Cintura (cm)" type="number" step="0.1" class="form-input" />
-            </div>
-            <div class="form-group">
-              <input v-model.number="form.cadera" placeholder="Cadera (cm)" type="number" step="0.1" class="form-input" />
-            </div>
-            <div class="form-group">
-              <input v-model.number="form.grasa" placeholder="% Grasa corporal (opcional)" type="number" step="0.1" class="form-input" />
-            </div>
-          </div>
-        </section>
-  
-        <!-- 3. Antecedentes médicos y hábitos -->
-        <section class="form-section">
-          <h3 class="section-title">Antecedentes y hábitos</h3>
-          <div class="form-grid">
-            <div class="form-group full-width">
-              <textarea v-model="form.antecedentes" placeholder="Enfermedades, medicamentos, alergias..." class="form-textarea"></textarea>
-            </div>
-            <div class="form-group full-width">
-              <textarea v-model="form.habitos" placeholder="Sueño, actividad física, agua..." class="form-textarea"></textarea>
-            </div>
-          </div>
-        </section>
-  
-        <!-- 4. Evaluación dietética -->
-        <section class="form-section">
-          <h3 class="section-title">Evaluación dietética</h3>
-          <div class="form-grid">
-            <div class="form-group full-width">
-              <textarea v-model="form.frecuencia" placeholder="Frecuencia de comidas" class="form-textarea"></textarea>
-            </div>
-            <div class="form-group full-width">
-              <textarea v-model="form.preferencias" placeholder="Preferencias y restricciones" class="form-textarea"></textarea>
-            </div>
-            <div class="form-group full-width">
-              <textarea v-model="form.registro24h" placeholder="Registro de 24 horas (opcional)" class="form-textarea"></textarea>
-            </div>
-          </div>
-        </section>
-  
-        <!-- 5. Objetivos del paciente -->
-        <section class="form-section">
-          <h3 class="section-title">Objetivos del paciente</h3>
-          <div class="form-grid">
-            <div class="form-group full-width">
-              <textarea v-model="form.objetivos" placeholder="Objetivos del paciente" class="form-textarea"></textarea>
-            </div>
-          </div>
-        </section>
-  
-        <!-- 6. Observaciones del profesional y plan -->
-        <section class="form-section">
-          <h3 class="section-title">Plan Nutricional</h3>
-          <div class="form-grid">
-            <div class="form-group full-width">
-              <textarea v-model="form.diagnostico" placeholder="Diagnóstico nutricional" class="form-textarea"></textarea>
-            </div>
-            <div class="form-group full-width">
-              <textarea v-model="form.recomendaciones" placeholder="Recomendaciones iniciales" class="form-textarea"></textarea>
-            </div>
-            <div class="form-group full-width">
-              <textarea v-model="form.plan" placeholder="Plan alimentario base" class="form-textarea"></textarea>
-            </div>
-          </div>
-        </section>
-  
-        <button type="submit" class="submit-button">
-          Guardar Consulta
-        </button>
-      </form>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'ConsultaNutricional',
-    data() {
-      return {
-        form: {
-          nombre: '', rut: '', edad: null, sexo: '', telefono: '', email: '', fecha: '',
-          peso: null, altura: null, cintura: null, cadera: null, grasa: null,
-          antecedentes: '', habitos: '', frecuencia: '', preferencias: '', registro24h: '',
-          objetivos: '', diagnostico: '', recomendaciones: '', plan: ''
-        }
-      }
-    },
-    computed: {
-      calcularIMC() {
-        if (!this.form.peso || !this.form.altura) return ''
-        const alturaM = this.form.altura / 100
-        return (this.form.peso / (alturaM * alturaM)).toFixed(2)
-      }
-    },
-    methods: {
-      handleSubmit() {
-        console.log('Formulario enviado:', this.form)
-        alert('Consulta guardada con éxito')
+  <div class="consulta-container">
+    <form @submit.prevent="handleSubmit" class="consulta-form">
+      <h2 class="form-title">Consulta Nutricional</h2>
+
+      <!-- 1. Datos del paciente -->
+      <section class="form-section">
+        <h3 class="section-title">Datos del paciente</h3>
+        <div class="form-grid">
+          <input v-model="form.nombre" placeholder="Nombre completo" required class="form-input" />
+          <input v-model="form.rut" placeholder="RUT o ID" required class="form-input" />
+          <input v-model.number="form.edad" type="number" placeholder="Edad" required class="form-input" />
+          <select v-model="form.sexo" required class="form-input">
+            <option disabled value="">Sexo</option>
+            <option>Femenino</option>
+            <option>Masculino</option>
+            <option>Otro</option>
+          </select>
+          <input v-model="form.telefono" placeholder="Teléfono" class="form-input" />
+          <input v-model="form.email" placeholder="Correo electrónico" type="email" class="form-input" />
+          <input v-model="form.fecha" type="date" class="form-input" />
+        </div>
+      </section>
+
+      <!-- 2. Anamnesis social -->
+      <section class="form-section">
+        <h3 class="section-title">Anamnesis Social</h3>
+        <div class="form-grid">
+          <input v-model="form.asiste_con" placeholder="Asiste con..." class="form-input" />
+          <input v-model="form.hogar" placeholder="Descripción del hogar" class="form-input" />
+          <input v-model="form.vive_con" placeholder="Vive con..." class="form-input" />
+          <input v-model="form.escolaridad" placeholder="Escolaridad" class="form-input" />
+          <input v-model="form.acc_vivienda" placeholder="Acceso a vivienda" class="form-input" />
+          <input v-model="form.servicios_basicos" placeholder="Servicios básicos disponibles" class="form-input" />
+        </div>
+      </section>
+
+      <!-- 3. Datos antropométricos -->
+      <section class="form-section">
+        <h3 class="section-title">Datos antropométricos</h3>
+        <div class="form-grid">
+          <input v-model.number="form.peso" placeholder="Peso (kg)" type="number" step="0.1" class="form-input" />
+          <input v-model.number="form.altura" placeholder="Estatura (cm)" type="number" step="0.1" class="form-input" />
+          <input :value="calcularIMC" placeholder="IMC (calculado)" disabled class="form-input disabled" />
+          <input v-model.number="form.cintura" placeholder="Cintura (cm)" type="number" step="0.1" class="form-input" />
+          <input v-model.number="form.cadera" placeholder="Cadera (cm)" type="number" step="0.1" class="form-input" />
+          <input v-model.number="form.grasa" placeholder="% Grasa corporal (opcional)" type="number" step="0.1" class="form-input" />
+        </div>
+      </section>
+
+      <!-- 4. Anamnesis clínica -->
+      <section class="form-section">
+        <h3 class="section-title">Anamnesis Clínica</h3>
+        <div class="form-grid">
+          <input v-model="form.antecedente_familiar" placeholder="Antecedente familiar" class="form-input" />
+          <input v-model="form.medicamento" placeholder="Medicamentos que toma" class="form-input" />
+          <input v-model="form.alergia" placeholder="Alergias conocidas" class="form-input" />
+          <input v-model="form.antecedente_quirurgico" placeholder="Antecedentes quirúrgicos" class="form-input" />
+        </div>
+      </section>
+
+      <!-- 5. Signos y síntomas -->
+      <section class="form-section">
+        <h3 class="section-title">Signos y Síntomas</h3>
+        <div class="form-grid">
+          <input v-model="form.diuresis" placeholder="Diuresis" class="form-input" />
+          <input v-model="form.deposiciones" placeholder="Deposiciones" class="form-input" />
+          <input v-model="form.frecuencia_bristol" placeholder="Frecuencia tipo Bristol" class="form-input" />
+          <input v-model="form.sueno" placeholder="Calidad de sueño" class="form-input" />
+          <input v-model="form.sudoracion_nocturna" placeholder="Sudoración nocturna" class="form-input" />
+          <input v-model="form.otros_signos" placeholder="Otros signos y síntomas" class="form-input" />
+        </div>
+      </section>
+
+      <!-- 6. Hábitos -->
+      <section class="form-section">
+        <h3 class="section-title">Hábitos</h3>
+        <div class="form-grid">
+          <input v-model="form.alcohol" placeholder="Consumo de alcohol" class="form-input" />
+          <input v-model="form.droga" placeholder="Consumo de drogas" class="form-input" />
+          <input v-model="form.tabaco" placeholder="Consumo de tabaco" class="form-input" />
+          <input v-model="form.actividad_fisica" placeholder="Actividad física semanal" class="form-input" />
+        </div>
+      </section>
+
+      <!-- 7. Evaluación dietética -->
+      <section class="form-section">
+        <h3 class="section-title">Evaluación Dietética</h3>
+        <div class="form-grid">
+          <textarea v-model="form.frecuencia" placeholder="Frecuencia de comidas" class="form-textarea"></textarea>
+          <textarea v-model="form.preferencias" placeholder="Preferencias y restricciones" class="form-textarea"></textarea>
+          <textarea v-model="form.registro24h" placeholder="Registro de 24 horas" class="form-textarea"></textarea>
+        </div>
+      </section>
+
+      <!-- 8. Objetivos y plan -->
+      <section class="form-section">
+        <h3 class="section-title">Objetivos y Plan Nutricional</h3>
+        <div class="form-grid">
+          <textarea v-model="form.objetivos" placeholder="Objetivos del paciente" class="form-textarea"></textarea>
+          <textarea v-model="form.diagnostico" placeholder="Diagnóstico nutricional" class="form-textarea"></textarea>
+          <textarea v-model="form.recomendaciones" placeholder="Recomendaciones iniciales" class="form-textarea"></textarea>
+          <textarea v-model="form.plan" placeholder="Plan alimentario base" class="form-textarea"></textarea>
+        </div>
+      </section>
+
+      <button type="submit" class="submit-button">Guardar Consulta</button>
+    </form>
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+export default {
+  name: 'ConsultaNutricional',
+  data() {
+    return {
+      form: {
+  nombre: '', rut: '', edad: null, sexo: '', telefono: '', email: '', fecha: '',
+  peso: null, altura: null, cintura: null, cadera: null, grasa: null,
+  antecedentes: '', antecedente_familiar: '', antecedente_quirurgico: '', medicamento: '', alergia: '',
+  habitos: '', alcohol: '', droga: '', tabaco: '', actividad_fisica: '',
+  frecuencia: '', preferencias: '', registro24h: '',
+  objetivos: '', diagnostico: '', recomendaciones: '', plan: '',
+  asiste_con: '', hogar: '', vive_con: '', escolaridad: '', acc_vivienda: '', servicios_basicos: '',
+  diuresis: '', deposiciones: '', frecuencia_bristol: '', sueno: '', sudoracion_nocturna: '', otros_signos: ''
+},
+      idFicha: null
+    }
+  },
+  computed: {
+    calcularIMC() { /* ... */ }
+  },
+  mounted() {
+    // AQUÍ accede a la ruta así ⬇️
+    this.idFicha = this.$route.params.id
+
+    if (this.idFicha) {
+      axios.get(`/api/fichas/${this.idFicha}`)
+        .then(res => {
+          this.form = { ...this.form, ...res.data }
+        })
+        .catch(() => {
+          alert('No se pudo cargar la ficha.')
+        })
+    }
+  },
+  methods: {
+    handleSubmit() {
+      if (this.idFicha) {
+        axios.put(`/api/fichas/${this.idFicha}`, this.form)
+          .then(() => alert('Ficha actualizada con éxito'))
+          .catch(() => alert('Error al actualizar ficha'))
+      } else {
+        axios.post('/api/fichas', this.form)
+          .then(() => alert('Ficha creada con éxito'))
+          .catch(() => alert('Error al crear ficha'))
       }
     }
   }
-  </script>
-  
+}
+
+</script>
   <style scoped>
   .consulta-container {
     width: 100%;
