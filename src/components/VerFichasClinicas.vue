@@ -122,11 +122,13 @@
                     <p><strong>IMC:</strong> {{ consulta.imc }}</p>
                   </div>
                   <div class="consulta-notas">
+                    <button @click="mostrarNotas = true" class="action-button history">Ver Notas de Seguimiento</button>
                     <p><strong>Observaciones:</strong> {{ consulta.observaciones }}</p>
                     <p><strong>Plan:</strong> {{ consulta.plan }}</p>
                   </div>
                 </div>
               </div>
+              
               <div v-else class="no-data">
                 <p>No hay consultas registradas.</p>
               </div>
@@ -214,6 +216,12 @@
         :paciente-id="fichaSeleccionada.id"
         @cerrar="mostrarHistorial = false"
       />
+      <NotasSeguimiento 
+  v-if="mostrarNotas"
+  :paciente-id="fichaSeleccionada.id"
+  @cerrar="mostrarNotas = false"
+/>
+
     </div>
   </div>
 </template>
@@ -221,6 +229,8 @@
 <script>
 import ControlPeriodico from './ControlPeriodico.vue';
 import HistorialClinico from '@/components/HistorialClinico.vue';
+import NotasSeguimiento from '@/components/NotasSeguimiento.vue';
+
 
 export default {
   name: 'BusquedaFichas',
