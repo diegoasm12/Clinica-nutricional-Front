@@ -128,7 +128,10 @@
                   </div>
                 </div>
               </div>
-              
+              <div class="detalle-section" v-if="fichaSeleccionada.historial && fichaSeleccionada.historial.length > 0">
+              <GraficaEvolucion :historial="fichaSeleccionada.historial" />
+              </div>
+
               <div v-else class="no-data">
                 <p>No hay consultas registradas.</p>
               </div>
@@ -230,13 +233,17 @@
 import ControlPeriodico from './ControlPeriodico.vue';
 import HistorialClinico from '@/components/HistorialClinico.vue';
 import NotasSeguimiento from '@/components/NotasSeguimiento.vue';
+import GraficaEvolucion from '@/components/GraficaEvolucion.vue';
+
 
 
 export default {
   name: 'BusquedaFichas',
   components: {
-    ControlPeriodico,
-    HistorialClinico
+      ControlPeriodico,
+  HistorialClinico,
+  NotasSeguimiento,
+  GraficaEvolucion,
   },
   data() {
     return {
