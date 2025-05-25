@@ -13,6 +13,7 @@ import ListaPacientes from "../components/ListaPacientes.vue";
 import GestiondeUsuarios from "../components/GestiondeUsuarios.vue";
 import GestiondeRoles from "../components/GestiondeRoles.vue";
 import VerPlanNutricional from "../components/VerPlanNutricional.vue";
+import ConsultarEstadoFicha from "../components/ConsultarEstadoFicha.vue";
 
 // Lazy loading para las demás páginas
 const Dashboard = () => import("@/pages/Dashboard.vue");
@@ -133,7 +134,12 @@ const routes = [
         component: VerPlanNutricional,
         meta: { requiresAuth: false }
       },
-    
+      {
+        path: 'ConsultarestadoFicha',
+        name: 'ConsultarestadoFicha',
+        component: ConsultarEstadoFicha,
+        meta: { requiresAuth: false }
+      },
       {
         path: 'fichaclinica/:id/editar',
         name: 'EditarFicha',
