@@ -10,6 +10,8 @@ import FichaClinica from "../components/FichaClinica.vue";
 import VerFichasClinicas from "../components/VerFichasClinicas.vue";
 import EvaluacionNutricional from "../components/EvaluacionNutricional.vue";
 import ListaPacientes from "../components/ListaPacientes.vue";
+import GestiondeUsuarios from "../components/GestiondeUsuarios.vue";
+import GestiondeRoles from "../components/GestiondeRoles.vue";
 
 // Lazy loading para las demás páginas
 const Dashboard = () => import("@/pages/Dashboard.vue");
@@ -107,17 +109,30 @@ const routes = [
         meta: { requiresAuth: false }
       },
       {
+        path: 'gestionusuarios',
+        name: 'gestionusuarios',
+        component: GestiondeUsuarios,
+        meta: { requiresAuth: false }
+      },
+      {
+        path: 'gestionroles',
+        name: 'gestionroles',
+        component: GestiondeRoles,
+        meta: { requiresAuth: false }
+      },
+      {
         path: 'listaPacientes',
         name: 'listaPacientes',
         component: ListaPacientes,
         meta: { requiresAuth: false }
       },
+    
       {
-  path: 'fichaclinica/:id/editar',
-  name: 'EditarFicha',
-  component: FichaClinica,
-  meta: { requiresAuth: false }
-},
+        path: 'fichaclinica/:id/editar',
+        name: 'EditarFicha',
+        component: FichaClinica,
+        meta: { requiresAuth: false }
+      },
 
       // Redirección para rutas no encontradas dentro del dashboard
       { path: "*", redirect: "/admin/dashboard" }

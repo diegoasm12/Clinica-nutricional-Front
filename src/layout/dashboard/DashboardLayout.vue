@@ -32,6 +32,16 @@
           name="Ver Pacientes"
           icon="tim-icons icon-pin"
         />
+        <sidebar-link
+          to="/admin/gestionusuarios"
+          name="Gestión de usuarios"
+          icon="tim-icons icon-pin"
+        />
+        <sidebar-link
+          to="/admin/gestionroles"
+          name="Gestión de Roles"
+          icon="tim-icons icon-pin"
+        />
       </template>
     </side-bar>
     <div class="main-panel">
