@@ -12,6 +12,7 @@ import EvaluacionNutricional from "../components/EvaluacionNutricional.vue";
 import ListaPacientes from "../components/ListaPacientes.vue";
 import GestiondeUsuarios from "../components/GestiondeUsuarios.vue";
 import GestiondeRoles from "../components/GestiondeRoles.vue";
+import VerPlanNutricional from "../components/VerPlanNutricional.vue";
 
 // Lazy loading para las demás páginas
 const Dashboard = () => import("@/pages/Dashboard.vue");
@@ -124,6 +125,12 @@ const routes = [
         path: 'listaPacientes',
         name: 'listaPacientes',
         component: ListaPacientes,
+        meta: { requiresAuth: false }
+      },
+      {
+        path: 'verplannutrional',
+        name: 'verplannutrional',
+        component: VerPlanNutricional,
         meta: { requiresAuth: false }
       },
     

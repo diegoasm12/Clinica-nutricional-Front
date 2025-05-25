@@ -101,74 +101,86 @@ export default {
   display: flex;
   justify-content: center;
 }
+
 .gestion-content {
   width: 100%;
   max-width: 1000px;
-  background: white;
+  background: #1a202c;
   border-radius: 8px;
   padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
+
 .form-title {
-  color: #2c3e50;
+  color: #f9fafb;
   text-align: center;
   margin-bottom: 30px;
   font-size: 2rem;
 }
-.section-title {
+
+.section-title,
+.form-label {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #4a5568;
-  margin-bottom: 1rem;
+  color: #e2e8f0;
+  margin-bottom: 0.5rem;
 }
+
 .form-group {
   margin-bottom: 1.5rem;
 }
-.form-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #4a5568;
-}
+
 .form-input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #4a5568;
   border-radius: 6px;
   font-size: 1rem;
+  background-color: #2d3748;
+  color: #f9fafb;
 }
-.loading-state, .empty-state {
+
+.loading-state,
+.empty-state {
   text-align: center;
   padding: 2rem;
-  color: #4a5568;
+  color: #cbd5e0;
 }
+
 .roles-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
 }
+
 .role-card {
-  background: white;
+  background: #2d3748;
+  border: 1px solid #4a5568;
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  color: #edf2f7;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   transition: 0.3s;
 }
+
 .role-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
 }
+
 .role-info h3 {
   margin: 0 0 1rem 0;
-  color: #2c3e50;
+  color: #f9fafb;
   font-size: 1.1rem;
   font-weight: 600;
 }
+
 .descripcion {
   font-size: 0.95rem;
-  color: #4a5568;
+  color: #cbd5e0;
   margin-top: 0.25rem;
 }
+
 .submit-button {
   width: 100%;
   padding: 0.75rem;
@@ -182,10 +194,12 @@ export default {
   transition: 0.3s;
   margin-top: 1rem;
 }
+
 .submit-button:hover {
   background-color: #9e4fb0;
   transform: translateY(-2px);
 }
+
 .notificacion {
   position: fixed;
   top: 60px;
@@ -194,19 +208,23 @@ export default {
   border-radius: 5px;
   color: white;
   font-weight: 500;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   animation: slideIn 0.5s, fadeOut 0.5s 2.5s forwards;
 }
+
 .notificacion.info {
   background-color: #4299e1;
 }
+
 .notificacion.exito {
   background-color: #48bb78;
 }
+
 .notificacion.error {
   background-color: #f56565;
 }
+
 @keyframes slideIn {
   from {
     transform: translateX(100%);
@@ -217,6 +235,7 @@ export default {
     opacity: 1;
   }
 }
+
 @keyframes fadeOut {
   from {
     opacity: 1;
@@ -225,5 +244,5 @@ export default {
     opacity: 0;
   }
 }
- 
 </style>
+

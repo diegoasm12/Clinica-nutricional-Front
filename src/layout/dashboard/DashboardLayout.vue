@@ -42,6 +42,11 @@
           name="Gestión de Roles"
           icon="tim-icons icon-pin"
         />
+        <sidebar-link
+          to="/admin/verplannutrional"
+          name="Planes Nutricionales"
+          icon="tim-icons icon-pin"
+        />
       </template>
     </side-bar>
     <div class="main-panel">
