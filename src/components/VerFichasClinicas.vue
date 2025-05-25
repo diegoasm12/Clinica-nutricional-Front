@@ -203,6 +203,7 @@
             <button @click="eliminarFicha(fichaSeleccionada.id)" class="action-button danger">Eliminar ficha</button>
             <button @click="mostrarControlPeriodico = true" class="action-button control">Agregar control periódico</button>
             <button @click="mostrarHistorial = true" class="action-button history">Ver Historial Clínico</button>
+            <button @click="compartirFicha(fichaSeleccionada)" class="action-button secondary">Compartir por correo</button>
             <button @click="closeModal" class="action-button cancel">Cerrar</button>
           </div>
         </div>
@@ -653,7 +654,15 @@ export default {
       const sizes = ['Bytes', 'KB', 'MB', 'GB'];
       const i = Math.floor(Math.log(bytes) / Math.log(k));
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
+    },
+    compartirFicha(ficha) {
+  const emailDestino = prompt(`Ingrese el correo al que desea enviar la ficha de ${ficha.nombre}:`);
+  if (!emailDestino) return;
+
+  // Simulación de envío por correo
+  alert(`Se ha enviado la ficha del paciente "${ficha.nombre}" al correo: ${emailDestino}`);
+}
+
   }
 }
 </script>
