@@ -2,33 +2,50 @@
   <div class="login-full-page">
     <div class="row g-0 h-100">
       <!-- Columna del logo -->
-      <div class="col-md-6 d-none d-md-flex align-items-center justify-content-center bg-white">
+      <div
+        class="col-md-6 d-none d-md-flex align-items-center justify-content-center bg-white"
+      >
         <div class="text-center p-5">
-          <img alt="Nutri logo" class="logo mb-4" src="../../../public/Logo-app.png" style="max-width: 300px; height: auto;"/>
+          <img
+            alt="Nutri logo"
+            class="logo mb-4"
+            src="../../../public/Logo-app.png"
+            style="max-width: 300px; height: auto"
+          />
           <h2 class="text-dark fs-1 fw-bold">NutriPro</h2>
         </div>
       </div>
-      
+
       <!-- Columna del formulario -->
       <div class="col-md-6 d-flex align-items-center justify-content-center">
-        <div class="w-100 bg-white p-4 p-md-5 rounded-start-0 shadow-lg rounded-4" style="max-width: 500px">
+        <div
+          class="w-100 bg-white p-4 p-md-5 rounded-start-0 shadow-lg rounded-4"
+          style="max-width: 500px"
+        >
           <div class="d-block d-md-none text-center mb-4">
-            <img alt="Nutri logo" class="logo" src="../../../public/Logo-app.png" style="max-width: 150px; height: auto;"/>
+            <img
+              alt="Nutri logo"
+              class="logo"
+              src="../../../public/Logo-app.png"
+              style="max-width: 150px; height: auto"
+            />
           </div>
-          
+
           <h1 class="text-center text-dark mb-4 fs-2">INICIE SESIÓN</h1>
-          
+
           <div class="mb-4 w-100">
-            <label class="form-label mb-2 fs-5 fw-medium">Correo electrónico</label>
+            <label class="form-label mb-2 fs-5 fw-medium"
+              >RUT (sin puntos ni guión)</label
+            >
             <input
-              type="email"
+              type="text"
               class="form-control text-dark py-3 px-4 border border-gray-300 rounded-3"
-              placeholder="ejemplo@correo.com"
-              v-model="email"
+              placeholder="Ej: 123456789"
+              v-model="rut"
               required
             />
           </div>
-          
+
           <div class="mb-4 w-100">
             <label class="form-label mb-2 fs-5 fw-medium">Contraseña</label>
             <input
@@ -41,14 +58,20 @@
           </div>
 
           <div class="text-center my-3">
-            <RouterLink to="/forgot-password" class="text-decoration-none text-purple fw-medium">
+            <RouterLink
+              to="/forgot-password"
+              class="text-decoration-none text-purple fw-medium"
+            >
               ¿Olvidaste tu contraseña?
             </RouterLink>
           </div>
-          
-          <hr class="my-4 text-gray-300">
-          
-          <button class="w-100 btn-purple py-3 text-white fw-semibold fs-5" @click="iniciarSesion">
+
+          <hr class="my-4 text-gray-300" />
+
+          <button
+            class="w-100 btn-purple py-3 text-white fw-semibold fs-5"
+            @click="iniciarSesion"
+          >
             INGRESAR
           </button>
         </div>
@@ -58,23 +81,61 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  name: 'Login',
+  name: "Login",
   data() {
     return {
-      email: '',
-      password: ''
+      rut: "",
+      password: "",
     };
   },
   methods: {
-    iniciarSesion() {
-      if (this.email && this.password) {
-        this.$router.push('/admin/verfichasclinicas');
-      } else {
-        alert('Debe ingresar todos los datos.');
+    validarRut(rut) {
+      return /^\d+$/.test(rut);
+    },
+
+    async iniciarSesion() {
+      if (!this.rut || !this.password) {
+        alert("Debe ingresar todos los datos.");
+        return;
       }
-    }
-  }
+
+      if (!this.validarRut(this.rut)) {
+        alert("El RUT debe ser solo números.");
+        return;
+      }
+
+      try {
+        const response = await axios.post(
+          `${process.env.VUE_APP_API_URL}/auth`,
+          {
+            rut: parseInt(this.rut),
+            password: this.password,
+          }
+        );
+
+        if (response.status === 201) {
+          const token = response.data.jwt;
+
+          // Guardamos el token en localStorage
+          localStorage.setItem("token", token);
+
+          // Redirigimos al usuario
+          this.$router.push("/admin/verfichasclinicas");
+        }
+      } catch (error) {
+        if (error.response) {
+          alert(
+            `Error: ${error.response.data.message || "Credenciales inválidas"}`
+          );
+        } else {
+          alert("Error de conexión al servidor.");
+        }
+      }
+    },
+  },
 };
 </script>
 
@@ -144,20 +205,20 @@ export default {
     border-top-left-radius: var(--bs-border-radius) !important;
     border-bottom-left-radius: var(--bs-border-radius) !important;
   }
-  
+
   .bg-light {
     background-color: white !important;
   }
-  
+
   .shadow-lg {
     box-shadow: none !important;
   }
-  
+
   /* Asegurar que el fondo ocupe toda la pantalla en móviles */
   .login-full-page {
     background-color: white;
   }
-  
+
   .col-md-6.bg-light {
     background-color: white !important;
   }

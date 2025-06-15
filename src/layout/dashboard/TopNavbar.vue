@@ -39,8 +39,6 @@
       <collapse-transition>
         <div class="collapse navbar-collapse show" v-show="showMenu">
           <ul class="navbar-nav" :class="$rtl.isRTL ? 'mr-auto' : 'ml-auto'">
-            
-            
             <base-dropdown
               tag="li"
               :menu-on-right="!$rtl.isRTL"
@@ -61,9 +59,12 @@
                 <b class="caret d-none d-lg-block d-xl-block"></b>
                 <p class="d-lg-none">Log out</p>
               </a>
-             
+
+              <!-- Log out -->
               <li class="nav-link">
-                <a href="#" class="nav-item dropdown-item">Log out</a>
+                <a href="#" class="nav-item dropdown-item" @click="logout"
+                  >Log out</a
+                >
               </li>
             </base-dropdown>
           </ul>
@@ -72,6 +73,7 @@
     </div>
   </nav>
 </template>
+
 <script>
 import { CollapseTransition } from "vue2-transitions";
 import Modal from "@/components/Modal";
@@ -116,6 +118,13 @@ export default {
     },
     toggleMenu() {
       this.showMenu = !this.showMenu;
+    },
+    logout() {
+      // Aquí eliminamos el token del localStorage
+      localStorage.removeItem("token");
+
+      // Redirigimos al login
+      this.$router.push("/login");
     },
   },
 };

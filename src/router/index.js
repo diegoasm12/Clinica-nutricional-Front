@@ -3,7 +3,7 @@ import routes from "./routes";
 
 // configure router
 const router = new VueRouter({
-  routes, // short for routes: routes
+  routes,
   linkExactActiveClass: "active",
   scrollBehavior: (to) => {
     if (to.hash) {
@@ -12,6 +12,20 @@ const router = new VueRouter({
       return { x: 0, y: 0 };
     }
   },
+});
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem("token");
+
+  if (to.path === "/login" && token) {
+    return next("/admin/dashboard");
+  }
+
+  if (to.matched.some((record) => record.meta.requiresAuth) && !token) {
+    return next("/login");
+  }
+
+  next();
 });
 
 export default router;
