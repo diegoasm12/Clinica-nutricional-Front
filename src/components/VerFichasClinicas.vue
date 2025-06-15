@@ -268,6 +268,60 @@
             <h3>Historial Antropometría</h3>
             <p>No existen registros antropométricos.</p>
           </div>
+
+          <!-- Archivos adjuntos -->
+          <div class="detalle-section">
+            <h3>Archivos Adjuntos</h3>
+
+            <div class="archivos-container">
+              <div v-if="archivos.length === 0" class="no-files">
+                No hay archivos adjuntos.
+              </div>
+
+              <div v-else class="archivos-list">
+                <div
+                  v-for="(archivo, index) in archivos"
+                  :key="index"
+                  class="archivo-item"
+                >
+                  <div class="archivo-info">
+                    <i :class="getFileIcon(archivo.tipo)"></i>
+                    <span class="archivo-nombre">{{ archivo.nombre }}</span>
+                    <span class="archivo-fecha">{{ archivo.fecha }}</span>
+                    <span class="archivo-tamano">{{ archivo.tamano }}</span>
+                  </div>
+                  <div class="archivo-acciones">
+                    <button class="action-button small">
+                      <i class="fas fa-download"></i>
+                    </button>
+                    <button class="action-button small">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-button small danger">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Exportación de archivos -->
+          <div class="detalle-section">
+            <h3>Exportación de archivos</h3>
+            <div class="botones-container">
+              <button class="action-button primary" @click="exportarPlan">
+                Exportar plan alimenticio
+              </button>
+              <button
+                class="action-button primary"
+                @click="exportarFicha"
+                style="margin-left: 10px"
+              >
+                Exportar ficha
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="modal-footer">
@@ -309,6 +363,7 @@ export default {
       fichaSeleccionada: null,
       showAntropometria: false,
       nuevoControl: { peso: null, altura: null },
+      archivos: [],
     };
   },
   components: {
@@ -318,6 +373,34 @@ export default {
     this.obtenerFichas();
   },
   methods: {
+    getFileIcon(tipo) {
+      if (tipo === "pdf") return "fas fa-file-pdf";
+      if (tipo === "docx") return "fas fa-file-word";
+      if (tipo === "image") return "fas fa-file-image";
+      return "fas fa-file";
+    },
+    exportarPlan() {
+      const rut = this.fichaSeleccionada?.fkUsuario?.rut;
+      if (!rut) return alert("RUT no disponible");
+
+      // Aquí luego integrarás la API GET /api/v1/pdf-manager/plan-nutricional/{rut}
+      alert(`Se exportará plan alimenticio para RUT: ${rut}`);
+    },
+
+    exportarFicha() {
+      const rut = this.fichaSeleccionada?.fkUsuario?.rut;
+      if (!rut) return alert("RUT no disponible");
+
+      // Aquí irá la integración real
+      alert(`Se exportará ficha completa para RUT: ${rut}`);
+    },
+
+    getFileIcon(tipo) {
+      if (tipo === "pdf") return "fas fa-file-pdf";
+      if (tipo === "docx") return "fas fa-file-word";
+      if (tipo === "image") return "fas fa-file-image";
+      return "fas fa-file";
+    },
     abrirAntropometria() {
       this.showAntropometria = true;
       console.log(this.fichaSeleccionada.id);
@@ -341,9 +424,32 @@ export default {
         this.loading = false;
       }
     },
+
     verDetalle(ficha) {
       this.fichaSeleccionada = ficha;
       this.showModal = true;
+
+      // Simulación de archivos por ahora
+      this.archivos = [
+        {
+          nombre: "Analisis_sangre.pdf",
+          tipo: "pdf",
+          fecha: "14-05-2023",
+          tamano: "240 KB",
+        },
+        {
+          nombre: "Receta_medica.docx",
+          tipo: "docx",
+          fecha: "19-06-2023",
+          tamano: "500 KB",
+        },
+        {
+          nombre: "Foto_progreso.jpg",
+          tipo: "image",
+          fecha: "09-07-2023",
+          tamano: "1000 KB",
+        },
+      ];
     },
     closeModal() {
       this.showModal = false;
