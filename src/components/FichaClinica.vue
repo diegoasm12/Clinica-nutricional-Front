@@ -20,10 +20,14 @@
             class="form-input"
           />
           <input
-            v-model.number="form.edad"
-            type="number"
-            placeholder="Edad"
-            required
+            v-model="form.email"
+            placeholder="Correo electrónico"
+            type="email"
+            class="form-input"
+          />
+          <input
+            v-model="form.telefono"
+            placeholder="Teléfono"
             class="form-input"
           />
           <select v-model="form.sexo" required class="form-input">
@@ -32,17 +36,6 @@
             <option>M</option>
           </select>
           <input
-            v-model="form.telefono"
-            placeholder="Teléfono"
-            class="form-input"
-          />
-          <input
-            v-model="form.email"
-            placeholder="Correo electrónico"
-            type="email"
-            class="form-input"
-          />
-          <input
             v-model="form.fechaNacimiento"
             type="date"
             class="form-input"
@@ -50,23 +43,24 @@
         </div>
       </section>
 
-      <!-- 2. Anamnesis social -->
+      <!-- Anamnesis Social -->
       <section class="form-section">
         <h3 class="section-title">Anamnesis Social</h3>
         <div class="form-grid">
           <input
-            v-model="form.asiste_con"
+            v-model="form.asisteCon"
             placeholder="Asiste con..."
             class="form-input"
           />
+          <input v-model="form.hijos" placeholder="Hijos" class="form-input" />
           <input
-            v-model="form.hogar"
-            placeholder="Descripción del hogar"
+            v-model="form.viveCon"
+            placeholder="Vive con..."
             class="form-input"
           />
           <input
-            v-model="form.vive_con"
-            placeholder="Vive con..."
+            v-model="form.ocupacion"
+            placeholder="Ocupación"
             class="form-input"
           />
           <input
@@ -75,94 +69,83 @@
             class="form-input"
           />
           <input
-            v-model="form.acc_vivienda"
-            placeholder="Acceso a vivienda"
+            v-model="form.redesDeApoyo"
+            placeholder="Redes de apoyo"
             class="form-input"
           />
           <input
-            v-model="form.servicios_basicos"
-            placeholder="Servicios básicos disponibles"
+            v-model="form.serviciosBasicos"
+            placeholder="Servicios básicos"
             class="form-input"
           />
         </div>
       </section>
 
-      <!-- 3. Datos antropométricos -->
+      <!-- Anamnesis Alimentaria -->
       <section class="form-section">
-        <h3 class="section-title">Datos antropométricos</h3>
+        <h3 class="section-title">Anamnesis Alimentaria</h3>
         <div class="form-grid">
           <input
-            v-model.number="form.peso"
-            placeholder="Peso (kg)"
-            type="number"
-            step="0.1"
+            v-model="form.alergiaIntolerancia"
+            placeholder="Alergias e intolerancias"
             class="form-input"
           />
           <input
-            v-model.number="form.altura"
-            placeholder="Estatura (cm)"
-            type="number"
-            step="0.1"
+            v-model="form.alimentoNoGusta"
+            placeholder="Alimentos que no le gustan"
             class="form-input"
           />
           <input
-            :value="calcularIMC"
-            placeholder="IMC (calculado)"
-            disabled
-            class="form-input disabled"
-          />
-          <input
-            v-model.number="form.cintura"
-            placeholder="Cintura (cm)"
-            type="number"
-            step="0.1"
+            v-model="form.alimentoPreferencia"
+            placeholder="Alimentos preferidos"
             class="form-input"
           />
           <input
-            v-model.number="form.cadera"
-            placeholder="Cadera (cm)"
-            type="number"
-            step="0.1"
+            v-model="form.cocinaEnCasa"
+            placeholder="¿Cocina en casa?"
             class="form-input"
           />
           <input
-            v-model.number="form.grasa"
-            placeholder="% Grasa corporal (opcional)"
-            type="number"
-            step="0.1"
+            v-model="form.habitualmenteComeEn"
+            placeholder="Habitualmente come en..."
             class="form-input"
           />
         </div>
       </section>
 
-      <!-- 4. Anamnesis clínica -->
+      <!-- Anamnesis Clínica -->
       <section class="form-section">
         <h3 class="section-title">Anamnesis Clínica</h3>
         <div class="form-grid">
           <input
-            v-model="form.antecedente_familiar"
+            v-model="form.antecedenteFamiliar"
             placeholder="Antecedente familiar"
             class="form-input"
           />
           <input
+            v-model="form.patologiaBase"
+            placeholder="Patología base"
+            class="form-input"
+          />
+          <input
             v-model="form.medicamento"
-            placeholder="Medicamentos que toma"
+            placeholder="Medicamentos"
+            class="form-input"
+          />
+          <input
+            v-model="form.anetecedenteQuirurgico"
+            placeholder="Antecedente quirúrgico"
             class="form-input"
           />
           <input
             v-model="form.alergia"
-            placeholder="Alergias conocidas"
-            class="form-input"
-          />
-          <input
-            v-model="form.antecedente_quirurgico"
-            placeholder="Antecedentes quirúrgicos"
+            placeholder="Alergias"
             class="form-input"
           />
         </div>
       </section>
 
-      <!-- 5. Signos y síntomas -->
+      <!-- Signos y síntomas -->
       <section class="form-section">
         <h3 class="section-title">Signos y Síntomas</h3>
         <div class="form-grid">
@@ -172,161 +155,127 @@
             class="form-input"
           />
           <input
-            v-model="form.deposiciones"
-            placeholder="Deposiciones"
+            v-model="form.apetito"
+            placeholder="Apetito"
             class="form-input"
           />
           <input
-            v-model="form.frecuencia_bristol"
-            placeholder="Frecuencia tipo Bristol"
+            v-model="form.calambre"
+            placeholder="Calambre"
             class="form-input"
           />
           <input
-            v-model="form.sueno"
-            placeholder="Calidad de sueño"
+            v-model="form.polidipsia"
+            placeholder="Polidipsia"
             class="form-input"
           />
           <input
-            v-model="form.sudoracion_nocturna"
+            v-model="form.poliuria"
+            placeholder="Poliuria"
+            class="form-input"
+          />
+          <input
+            v-model="form.deposicionBristol"
+            placeholder="Deposición (Bristol)"
+            class="form-input"
+          />
+          <input
+            v-model="form.tinnitus"
+            placeholder="Tinnitus"
+            class="form-input"
+          />
+          <input
+            v-model="form.sudoracionNocturna"
             placeholder="Sudoración nocturna"
             class="form-input"
           />
           <input
-            v-model="form.otros_signos"
-            placeholder="Otros signos y síntomas"
+            v-model="form.polifagia"
+            placeholder="Polifagia"
+            class="form-input"
+          />
+          <input
+            v-model="form.otroSigno"
+            placeholder="Otro síntoma"
             class="form-input"
           />
         </div>
       </section>
 
-      <!-- 6. Hábitos -->
+      <!-- Hábitos -->
       <section class="form-section">
         <h3 class="section-title">Hábitos</h3>
         <div class="form-grid">
           <input
             v-model="form.alcohol"
-            placeholder="Consumo de alcohol"
+            placeholder="Alcohol"
             class="form-input"
           />
+          <input v-model="form.droga" placeholder="Drogas" class="form-input" />
           <input
-            v-model="form.droga"
-            placeholder="Consumo de drogas"
-            class="form-input"
-          />
-          <input
-            v-model="form.tabaco"
-            placeholder="Consumo de tabaco"
-            class="form-input"
-          />
-          <input
-            v-model="form.actividad_fisica"
-            placeholder="Actividad física semanal"
+            v-model="form.actividadFisica"
+            placeholder="Actividad física"
             class="form-input"
           />
         </div>
       </section>
 
-      <!-- 7. Evaluación dietética -->
+      <!-- TENDENCIA CONSUMO -->
       <section class="form-section">
-        <h3 class="section-title">Evaluación Dietética</h3>
-        <div class="form-grid">
-          <textarea
-            v-model="form.frecuencia"
-            placeholder="Frecuencia de comidas"
-            class="form-textarea"
-          ></textarea>
-          <textarea
-            v-model="form.preferencias"
-            placeholder="Preferencias y restricciones"
-            class="form-textarea"
-          ></textarea>
-          <textarea
-            v-model="form.registro24h"
-            placeholder="Registro de 24 horas"
-            class="form-textarea"
-          ></textarea>
-        </div>
-      </section>
+        <h3 class="section-title">Encuesta de Tendencia de Consumo</h3>
 
-      <!-- 8. Objetivos y plan -->
-      <section class="form-section">
-        <h3 class="section-title">Objetivos y Plan Nutricional</h3>
-        <div class="form-grid">
-          <textarea
-            v-model="form.objetivos"
-            placeholder="Objetivos del paciente"
-            class="form-textarea"
-          ></textarea>
-          <textarea
-            v-model="form.diagnostico"
-            placeholder="Diagnóstico nutricional"
-            class="form-textarea"
-          ></textarea>
-          <textarea
-            v-model="form.recomendaciones"
-            placeholder="Recomendaciones iniciales"
-            class="form-textarea"
-          ></textarea>
-          <textarea
-            v-model="form.plan"
-            placeholder="Plan alimentario base"
-            class="form-textarea"
-          ></textarea>
-        </div>
-      </section>
-  <!-- 9. Encuesta de tendencia de consumo de alimentos -->
-<section class="form-section">
-  <h3 class="section-title">Encuesta de Tendencia de Consumo</h3>
-
-  <div
-    v-for="(item, index) in form.rEncuestaTendenciaConsumoAlimentos"
-    :key="index"
-    class="form-grid align-center"
-    style="align-items: center"
-  >
-    <div class="form-group">
-      <label class="form-label">Alimento</label>
-      <select v-model="item.fkAlimento" class="form-input" required>
-        <option disabled value="">Seleccione un alimento</option>
-        <option
-          v-for="alimento in alimentosDisponibles"
-          :key="alimento.id"
-          :value="alimento.id"
+        <div
+          v-for="(item, index) in form.encuestaConsumo"
+          :key="index"
+          class="form-grid align-center"
         >
-          {{ alimento.alimento }}
-        </option>
-      </select>
-    </div>
+          <div class="form-group">
+            <label>Alimento</label>
+            <select v-model="item.fkAlimento_id" class="form-input" required>
+              <option disabled value="">Seleccione un alimento</option>
+              <option
+                v-for="alimento in alimentosDisponibles"
+                :key="alimento.id"
+                :value="alimento.id"
+              >
+                {{ alimento.alimento }}
+              </option>
+            </select>
+          </div>
 
-    <div class="form-group">
-      <label class="form-label">Días por semana</label>
-      <select v-model="item.cuantosDiasSemana" class="form-input" required>
-        <option disabled value="">Días</option>
-        <option v-for="n in 7" :key="n" :value="n">{{ n }}</option>
-      </select>
-    </div>
+          <div class="form-group">
+            <label>Días por semana</label>
+            <select
+              v-model="item.cuantosDiasSemana"
+              class="form-input"
+              required
+            >
+              <option disabled value="">Seleccione días</option>
+              <option v-for="n in 7" :key="n" :value="n">{{ n }}</option>
+            </select>
+          </div>
 
-    <div class="form-group full-width" style="margin-top: 0.5rem">
-      <button
-        type="button"
-        @click="quitarAlimento(index)"
-        class="submit-button"
-        style="background-color: #e53e3e"
-      >
-        Quitar alimento
-      </button>
-    </div>
-  </div>
+          <div class="form-group full-width">
+            <button
+              type="button"
+              @click="quitarAlimento(index)"
+              class="submit-button"
+              style="background: #e53e3e"
+            >
+              Quitar alimento
+            </button>
+          </div>
+        </div>
 
-  <button
-    type="button"
-    @click="agregarAlimento"
-    class="submit-button"
-    style="margin-top: 1rem"
-  >
-    + Agregar alimento
-  </button>
-</section>
+        <button
+          type="button"
+          @click="agregarAlimento"
+          class="submit-button"
+          style="margin-top: 1rem"
+        >
+          + Agregar alimento
+        </button>
+      </section>
 
       <button type="submit" class="submit-button">Guardar Consulta</button>
     </form>
@@ -338,10 +287,14 @@ import axios from "axios";
 
 export default {
   name: "FichaClinica",
+  mounted() {
+    this.cargarAlimentos();
+  },
   data() {
     return {
       alimentosDisponibles: [],
       form: {
+        // Datos paciente
         rut: "",
         nombre: "",
         email: "",
@@ -358,92 +311,70 @@ export default {
         redesDeApoyo: "",
         serviciosBasicos: "",
 
+        // Anamnesis Alimentaria
+        alergiaIntolerancia: "",
+        alimentoNoGusta: "",
+        alimentoPreferencia: "",
+        cocinaEnCasa: "",
+        habitualmenteComeEn: "",
+
         // Anamnesis Clínica
         antecedenteFamiliar: "",
         patologiaBase: "",
         medicamento: "",
-        antecedenteQuirurgico: "",
+        anetecedenteQuirurgico: "",
         alergia: "",
 
         // Signos y síntomas
         diuresis: "",
-        deposiciones: "",
-        frecuenciaBristol: "",
-        sueno: "",
+        apetito: "",
+        calambre: "",
+        polidipsia: "",
+        poliuria: "",
+        deposicionBristol: "",
+        tinnitus: "",
         sudoracionNocturna: "",
-        otrosSignos: "",
+        polifagia: "",
+        otroSigno: "",
 
         // Hábitos
         alcohol: "",
         droga: "",
-        tabaco: "",
         actividadFisica: "",
 
-        // Evaluación dietética
-        frecuencia: "",
-        preferencias: "",
-        registro24h: "",
-
-        // Objetivos y plan
-        objetivos: "",
-        diagnostico: "",
-        recomendaciones: "",
-        plan: "",
-
-        // Datos antropométricos
-        peso: null,
-        altura: null,
-        cintura: null,
-        cadera: null,
-        grasa: null,
-
-        // Encuesta consumo
-        rEncuestaTendenciaConsumoAlimentos: []
+        // Alimentos a enviar
+        encuestaConsumo: [],
       },
     };
-  },
-  computed: {
-    calcularIMC() {
-      if (this.form.peso && this.form.altura) {
-        const alturaEnMetros = this.form.altura / 100;
-        return (this.form.peso / (alturaEnMetros ** 2)).toFixed(2);
-      }
-      return "";
-    }
-  },
-  mounted() {
-    this.cargarAlimentos();
   },
   methods: {
     async cargarAlimentos() {
       try {
-        const res = await axios.get(`${process.env.VUE_APP_API_URL}/alimento`)
+        const res = await axios.get(`${process.env.VUE_APP_API_URL}/alimento`);
         this.alimentosDisponibles = res.data;
+        console.log("alimentos", res);
       } catch (err) {
-        console.error("❌ Error cargando alimentos:", err);
+        console.error("Error cargando alimentos:", err);
       }
     },
 
     agregarAlimento() {
-      this.form.rEncuestaTendenciaConsumoAlimentos.push({
-        fkAlimento: "",
-        cuantosDiasSemana: 0
+      this.form.encuestaConsumo.push({
+        fkAlimento_id: "",
+        cuantosDiasSemana: 1,
       });
     },
 
     quitarAlimento(index) {
-      this.form.rEncuestaTendenciaConsumoAlimentos.splice(index, 1);
+      this.form.encuestaConsumo.splice(index, 1);
     },
-
     async handleSubmit() {
       try {
-        const fecha = new Date(this.form.fechaNacimiento);
-        if (isNaN(fecha.getTime())) {
-          alert("❌ Fecha de nacimiento inválida. Usa formato AAAA-MM-DD");
-          return;
-        }
-        const fechaFormateada = fecha.toISOString();
+        const fechaFormateada = new Date(
+          this.form.fechaNacimiento
+        ).toISOString();
 
+        // 1. Crear usuario
         const usuarioPayload = {
           rut: this.form.rut,
           nombre: this.form.nombre,
@@ -451,9 +382,7 @@ export default {
           telefono: this.form.telefono,
           sexo: this.form.sexo,
           fechaNacimiento: fechaFormateada,
-          rRolUsuario: {
-            fkRol_id: 2,
-          },
+          rRolUsuario: { fkRol_id: 2 },
         };
 
         const resUsuario = await axios.post(
@@ -461,81 +390,98 @@ export default {
           usuarioPayload
         );
         const usuarioId = resUsuario.data.id;
+        console.log("respuesta crear usuario", resUsuario);
 
-        const anamnesisSocialPayload = {
-          asisteCon: this.form.asisteCon,
-          hijos: this.form.hijos,
-          viveCon: this.form.viveCon,
-          ocupacion: this.form.ocupacion,
-          escolaridad: this.form.escolaridad,
-          redesDeApoyo: this.form.redesDeApoyo,
-          serviciosBasicos: this.form.serviciosBasicos,
-        };
-
+        // 2. Crear anamnesis social
         const resAnamnesisSocial = await axios.post(
           `${process.env.VUE_APP_API_URL}/anamnesis-social`,
-          anamnesisSocialPayload
-        );
-        const anamnesisSocialId = resAnamnesisSocial.data.id;
-
-        const anamnesisClinicaPayload = {
-          antecedenteFamiliar: this.form.antecedenteFamiliar,
-          patologiaBase: this.form.patologiaBase,
-          medicamento: this.form.medicamento,
-          antecedenteQuirurgico: this.form.antecedenteQuirurgico,
-          alergia: this.form.alergia,
-          signoSintoma: {
-            diuresis: this.form.diuresis,
-            deposicionBristol: this.form.frecuenciaBristol,
-            sueno: this.form.sueno,
-            sudoracionNocturna: this.form.sudoracionNocturna,
-            otro: this.form.otrosSignos,
-          },
-          habito: {
-            alcohol: this.form.alcohol,
-            droga: this.form.droga,
-            tabaco: this.form.tabaco,
-            actividadFisica: this.form.actividadFisica,
+          {
+            asisteCon: this.form.asisteCon,
+            hijos: this.form.hijos,
+            viveCon: this.form.viveCon,
+            ocupacion: this.form.ocupacion,
+            escolaridad: this.form.escolaridad,
+            redesDeApoyo: this.form.redesDeApoyo,
+            serviciosBasicos: this.form.serviciosBasicos,
           }
-        };
+        );
 
+        console.log("respuesta crear amanan social", resAnamnesisSocial);
+
+        // 3. Crear anamnesis alimentaria
+        const resAnamnesisAlimentaria = await axios.post(
+          `${process.env.VUE_APP_API_URL}/anamnesis-alimentaria`,
+          {
+            alergiaIntolerancia: this.form.alergiaIntolerancia,
+            alimentoNoGusta: this.form.alimentoNoGusta,
+            alimentoPreferencia: this.form.alimentoPreferencia,
+            cocinaEnCasa: this.form.cocinaEnCasa,
+            habitualmenteComeEn: this.form.habitualmenteComeEn,
+          }
+        );
+        console.log(
+          "respuesta crear amanan alimentaria",
+          resAnamnesisAlimentaria
+        );
+
+        // 4. Crear anamnesis clínica
         const resAnamnesisClinica = await axios.post(
           `${process.env.VUE_APP_API_URL}/anamnesis-clinica`,
-          anamnesisClinicaPayload
+          {
+            antecedenteFamiliar: this.form.antecedenteFamiliar,
+            patologiaBase: this.form.patologiaBase,
+            medicamento: this.form.medicamento,
+            anetecedenteQuirurgico: this.form.anetecedenteQuirurgico,
+            alergia: this.form.alergia,
+            signoSintoma: {
+              diuresis: this.form.diuresis,
+              apetito: this.form.apetito,
+              calambre: this.form.calambre,
+              polidipsia: this.form.polidipsia,
+              poliuria: this.form.poliuria,
+              deposicionBristol: this.form.deposicionBristol,
+              tinitus: this.form.tinnitus,
+              sudoracionNocturna: this.form.sudoracionNocturna,
+              polifagia: this.form.polifagia,
+              otro: this.form.otroSigno,
+            },
+            habito: {
+              alcohol: this.form.alcohol,
+              droga: this.form.droga,
+              actividadFisica: this.form.actividadFisica,
+            },
+          }
         );
-        const anamnesisClinicaId = resAnamnesisClinica.data.id;
 
-        const alimentariaPayload = {
-          frecuencia: this.form.frecuencia,
-          preferencias: this.form.preferencias,
-          registro24h: this.form.registro24h
-        };
+        console.log("respuesta crear amanan clinica", resAnamnesisClinica);
 
-        const resAlimentaria = await axios.post(
-          `${process.env.VUE_APP_API_URL}/anamnesis-alimentaria`,
-          alimentariaPayload
-        );
-        const alimentariaId = resAlimentaria.data.id;
-
+        // 5. Crear encuesta de tendencia consumo (esto ahora sí antes de la ficha)
         const encuestaPayload = {
-          alimentos: this.form.rEncuestaTendenciaConsumoAlimentos.map((item) => ({
-            fkAlimento: { id: item.fkAlimento },
-            cuantosDiasSemana: item.cuantosDiasSemana
-          }))
+          rEncuestaTendenciaConsumoAlimentos: this.form.encuestaConsumo.map(
+            (item) => ({
+              fkAlimento_id: item.fkAlimento_id,
+              cuantosDiasSemana: item.cuantosDiasSemana.toString(),
+            })
+          ),
         };
 
         const resEncuesta = await axios.post(
           `${process.env.VUE_APP_API_URL}/encuesta-tendencia-consumo`,
           encuestaPayload
         );
+
+        console.log("payload encuesta", encuestaPayload);
+        console.log("respuesta crear encuesta alimentcia", resEncuesta);
+
         const encuestaId = resEncuesta.data.id;
 
+        // 6. Finalmente crear la ficha incluyendo el id de encuesta
         const fichaPayload = {
           fkUsuario_id: usuarioId,
-          fkAnamnesisSocial_id: anamnesisSocialId,
-          fkAnamnesisClinica_id: anamnesisClinicaId,
-          fkAnamnesisAlimentaria_id: alimentariaId,
-          fkEncuestaTendenciaConsumo_id: encuestaId
+          fkAnamnesisSocial_id: resAnamnesisSocial.data.id,
+          fkAnamnesisClinica_id: resAnamnesisClinica.data.id,
+          fkAnamnesisAlimentaria_id: resAnamnesisAlimentaria.data.id,
+          fkEncuestaTendenciaConsumo_id: encuestaId,
         };
 
         const resFicha = await axios.post(
@@ -543,16 +489,18 @@ export default {
           fichaPayload
         );
 
-        console.log("✅ Ficha creada correctamente:", resFicha.data);
-        alert("✅ Ficha creada con éxito");
+        console.log("payload ficha", fichaPayload);
+        console.log("respuesta crear ficha", resFicha);
+        alert("✅ Ficha creada correctamente");
       } catch (error) {
-        console.error("❌ Error al crear ficha:", error.response?.data || error.message);
-        alert("❌ Error al crear ficha. Revisa consola para más detalles.");
+        console.error(error);
+        alert("❌ Error al guardar");
       }
-    }
-  }
+    },
+  },
 };
 </script>
+
 <style scoped>
 .consulta-container {
   width: 100%;
@@ -691,5 +639,4 @@ export default {
     padding: 0.8rem;
   }
 }
-
 </style>
