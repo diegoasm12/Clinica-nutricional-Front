@@ -1,14 +1,28 @@
 <template>
   <div class="busqueda-container">
     <h2 class="section-title">Listado de Fichas</h2>
+    <!-- Buscador -->
+<div class="search-box">
+  <input
+    type="text"
+    class="search-input"
+    v-model="busqueda"
+    @input="filtrarFichas"
+    placeholder="Buscar por nombre o RUT"
+  />
+</div>
 
     <div v-if="loading" class="loading">Cargando fichas...</div>
     <div v-else-if="fichas.length === 0" class="no-results">
       No hay fichas registradas.
     </div>
 
-    <div v-else class="fichas-grid">
-      <div v-for="ficha in fichas" :key="ficha.id" class="ficha-card">
+    <div v-else-if="fichasFiltradas.length === 0" class="no-results">
+  No se encontraron fichas para el criterio de búsqueda.
+</div>
+
+<div v-else class="fichas-grid">
+  <div v-for="ficha in fichasFiltradas" :key="ficha.id" class="ficha-card">
         <h3 class="text-dark">
           {{ ficha.fkUsuario?.nombre || "Nombre no disponible" }}
         </h3>
@@ -354,10 +368,13 @@
 <script>
 import axios from "axios";
 import ControlPeriodico from "./ControlPeriodico.vue";
+
 export default {
   data() {
     return {
       fichas: [],
+      fichasFiltradas: [], // NUEVO: lista filtrada
+      busqueda: "",        // NUEVO: input del filtro
       loading: false,
       showModal: false,
       fichaSeleccionada: null,
@@ -373,63 +390,30 @@ export default {
     this.obtenerFichas();
   },
   methods: {
-    getFileIcon(tipo) {
-      if (tipo === "pdf") return "fas fa-file-pdf";
-      if (tipo === "docx") return "fas fa-file-word";
-      if (tipo === "image") return "fas fa-file-image";
-      return "fas fa-file";
-    },
-    exportarPlan() {
-      const rut = this.fichaSeleccionada?.fkUsuario?.rut;
-      if (!rut) return alert("RUT no disponible");
-
-      // Aquí luego integrarás la API GET /api/v1/pdf-manager/plan-nutricional/{rut}
-      alert(`Se exportará plan alimenticio para RUT: ${rut}`);
-    },
-
-    exportarFicha() {
-      const rut = this.fichaSeleccionada?.fkUsuario?.rut;
-      if (!rut) return alert("RUT no disponible");
-
-      // Aquí irá la integración real
-      alert(`Se exportará ficha completa para RUT: ${rut}`);
-    },
-
-    getFileIcon(tipo) {
-      if (tipo === "pdf") return "fas fa-file-pdf";
-      if (tipo === "docx") return "fas fa-file-word";
-      if (tipo === "image") return "fas fa-file-image";
-      return "fas fa-file";
-    },
-    abrirAntropometria() {
-      this.showAntropometria = true;
-      console.log(this.fichaSeleccionada.id);
-    },
-    actualizarControles(nuevoControl) {
-      if (!this.fichaSeleccionada.antropometrias) {
-        this.fichaSeleccionada.antropometrias = [];
-      }
-      this.fichaSeleccionada.antropometrias.push(nuevoControl);
-      this.showAntropometria = false;
-    },
     async obtenerFichas() {
       this.loading = true;
       try {
         const res = await axios.get(`${process.env.VUE_APP_API_URL}/ficha`);
         this.fichas = res.data;
-        console.log(this.fichas);
+        this.filtrarFichas(); // aplicar filtro inicial
       } catch (err) {
         console.error("Error al obtener fichas:", err);
       } finally {
         this.loading = false;
       }
     },
-
+    filtrarFichas() {
+      const termino = this.busqueda.toLowerCase();
+      this.fichasFiltradas = this.fichas.filter((ficha) => {
+        const nombre = ficha.fkUsuario?.nombre?.toLowerCase() || "";
+        const rut = ficha.fkUsuario?.rut?.toString().toLowerCase() || "";
+        return nombre.includes(termino) || rut.includes(termino);
+      });
+    },
     verDetalle(ficha) {
       this.fichaSeleccionada = ficha;
       this.showModal = true;
 
-      // Simulación de archivos por ahora
       this.archivos = [
         {
           nombre: "Analisis_sangre.pdf",
@@ -471,8 +455,16 @@ export default {
     eliminarFicha() {
       alert("Lógica para eliminar ficha (aún no implementado)");
     },
-    abrirAntropometriaModal() {
+    abrirAntropometria() {
       this.showAntropometria = true;
+      console.log(this.fichaSeleccionada.id);
+    },
+    actualizarControles(nuevoControl) {
+      if (!this.fichaSeleccionada.antropometrias) {
+        this.fichaSeleccionada.antropometrias = [];
+      }
+      this.fichaSeleccionada.antropometrias.push(nuevoControl);
+      this.showAntropometria = false;
     },
     closeAntropometria() {
       this.showAntropometria = false;
@@ -482,9 +474,26 @@ export default {
       this.closeAntropometria();
       alert("Antropometría guardada (simulado)");
     },
+    exportarPlan() {
+      const rut = this.fichaSeleccionada?.fkUsuario?.rut;
+      if (!rut) return alert("RUT no disponible");
+      alert(`Se exportará plan alimenticio para RUT: ${rut}`);
+    },
+    exportarFicha() {
+      const rut = this.fichaSeleccionada?.fkUsuario?.rut;
+      if (!rut) return alert("RUT no disponible");
+      alert(`Se exportará ficha completa para RUT: ${rut}`);
+    },
+    getFileIcon(tipo) {
+      if (tipo === "pdf") return "fas fa-file-pdf";
+      if (tipo === "docx") return "fas fa-file-word";
+      if (tipo === "image") return "fas fa-file-image";
+      return "fas fa-file";
+    },
   },
 };
 </script>
+
 
 <style scoped>
 .busqueda-container {

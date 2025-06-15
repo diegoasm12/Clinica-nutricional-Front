@@ -14,11 +14,6 @@
         />
         <sidebar-link
           to="/maps"
-          name="Modificar Fichas clinicas"
-          icon="tim-icons icon-pin"
-        />
-        <sidebar-link
-          to="/maps"
           name="Gestión de Roles"
           icon="tim-icons icon-pin"
         />
