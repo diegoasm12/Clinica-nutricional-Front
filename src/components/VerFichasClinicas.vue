@@ -1,790 +1,307 @@
 <template>
-  <div>
-    <div class="busqueda-container">
-      <div class="search-header">
-        <h2 class="section-title">Búsqueda de Fichas Nutricionales</h2>
-        <div class="search-box">
-          <input
-            v-model="searchTerm"
-            @keyup.enter="buscarFichas"
-            placeholder="Buscar por RUT o nombre del paciente"
-            class="search-input"
-          />
-          <button @click="buscarFichas" class="search-button">Buscar</button>
-        </div>
-      </div>
+  <div class="busqueda-container">
+    <h2 class="section-title">Listado de Fichas</h2>
 
-      <!-- Filtros adicionales -->
-      <div class="filters-section">
-        <div class="filter-group">
-          <label>Ordenar por:</label>
-          <select v-model="sortBy" class="filter-select">
-            <option value="fecha">Fecha (más reciente)</option>
-            <option value="nombre">Nombre</option>
-            <option value="rut">RUT</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label>Estado:</label>
-          <select v-model="filtroEstado" class="filter-select">
-            <option value="todos">Todos</option>
-            <option value="activo">Activos</option>
-            <option value="inactivo">Inactivos</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Resultados de la búsqueda -->
-      <div v-if="loading" class="loading">
-        <p>Cargando fichas...</p>
-      </div>
-
-      <div v-else-if="fichas.length === 0" class="no-results">
-        <p>No se encontraron fichas. Intente con otra búsqueda.</p>
-      </div>
-
-      <div v-else class="results-section">
-        <h3 class="results-title">
-          {{ fichas.length }} resultados encontrados
-        </h3>
-
-        <div class="fichas-grid">
-          <div
-            v-for="ficha in fichasOrdenadas"
-            :key="ficha.id"
-            class="ficha-card"
-            :class="{ inactivo: ficha.estado === 'inactivo' }"
-          >
-            <div class="ficha-header">
-              <h3>{{ ficha.nombre }}</h3>
-              <span class="estado-badge" :class="ficha.estado">{{
-                ficha.estado === "activo" ? "Activo" : "Inactivo"
-              }}</span>
-            </div>
-
-            <div class="ficha-info">
-              <p><strong>RUT:</strong> {{ ficha.rut }}</p>
-              <p><strong>Edad:</strong> {{ ficha.edad }} años</p>
-              <p>
-                <strong>Última consulta:</strong> {{ formatDate(ficha.fecha) }}
-              </p>
-              <p><strong>IMC actual:</strong> {{ ficha.imc }}</p>
-            </div>
-
-            <div class="ficha-actions">
-              <button @click="verDetalle(ficha.id)" class="action-button view">
-                Ver detalles
-              </button>
-              <button
-                @click="nuevaConsulta(ficha.id)"
-                class="action-button primary"
-              >
-                Nueva consulta
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Paginación -->
-        <div class="pagination">
-          <button
-            @click="cambiarPagina(paginaActual - 1)"
-            :disabled="paginaActual === 1"
-            class="pagination-button"
-          >
-            Anterior
-          </button>
-          <span class="pagination-info"
-            >Página {{ paginaActual }} de {{ totalPaginas }}</span
-          >
-          <button
-            @click="cambiarPagina(paginaActual + 1)"
-            :disabled="paginaActual === totalPaginas"
-            class="pagination-button"
-          >
-            Siguiente
-          </button>
-        </div>
-      </div>
-
-      <!-- Modal detalle ficha -->
-      <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>Ficha de {{ fichaSeleccionada.nombre }}</h2>
-            <button @click="closeModal" class="close-button">&times;</button>
-          </div>
-
-          <div class="modal-body">
-            <div class="detalle-section">
-              <h3>Datos Personales</h3>
-              <div class="detalle-grid">
-                <p><strong>RUT:</strong> {{ fichaSeleccionada.rut }}</p>
-                <p><strong>Edad:</strong> {{ fichaSeleccionada.edad }} años</p>
-                <p><strong>Sexo:</strong> {{ fichaSeleccionada.sexo }}</p>
-                <p>
-                  <strong>Teléfono:</strong> {{ fichaSeleccionada.telefono }}
-                </p>
-                <p><strong>Email:</strong> {{ fichaSeleccionada.email }}</p>
-              </div>
-            </div>
-
-            <div class="detalle-section">
-              <h3>Historial de Consultas</h3>
-              <div
-                v-if="
-                  fichaSeleccionada.historial &&
-                  fichaSeleccionada.historial.length
-                "
-              >
-                <div
-                  v-for="(consulta, index) in fichaSeleccionada.historial"
-                  :key="index"
-                  class="consulta-item"
-                >
-                  <div class="consulta-header">
-                    <h4>Consulta {{ formatDate(consulta.fecha) }}</h4>
-                    <span class="consulta-tag">{{
-                      consulta.tipo || "Control"
-                    }}</span>
-                  </div>
-                  <div class="consulta-datos">
-                    <p><strong>Peso:</strong> {{ consulta.peso }} kg</p>
-                    <p><strong>Altura:</strong> {{ consulta.altura }} cm</p>
-                    <p><strong>IMC:</strong> {{ consulta.imc }}</p>
-                  </div>
-                  <div class="consulta-notas">
-                    <button
-                      @click="mostrarNotas = true"
-                      class="action-button history"
-                    >
-                      Ver Notas de Seguimiento
-                    </button>
-                    <p>
-                      <strong>Observaciones:</strong>
-                      {{ consulta.observaciones }}
-                    </p>
-                    <p><strong>Plan:</strong> {{ consulta.plan }}</p>
-                  </div>
-                </div>
-              </div>
-              <div
-                class="detalle-section"
-                v-if="
-                  fichaSeleccionada.historial &&
-                  fichaSeleccionada.historial.length > 0
-                "
-              >
-                <GraficaEvolucion :historial="fichaSeleccionada.historial" />
-              </div>
-
-              <div v-else class="no-data">
-                <p>No hay consultas registradas.</p>
-              </div>
-            </div>
-
-            <div class="detalle-section">
-              <h3>Archivos Adjuntos</h3>
-              <div class="archivos-container">
-                <div class="subir-archivo">
-                  <input
-                    type="file"
-                    id="fileInput"
-                    ref="fileInput"
-                    @change="handleFileUpload"
-                    multiple
-                    style="display: none"
-                  />
-                  <button @click="triggerFileInput" class="upload-button">
-                    <i class="fas fa-cloud-upload-alt"></i> Subir Archivos
-                  </button>
-                  <span class="upload-hint"
-                    >Formatos permitidos: PDF, JPG, PNG, DOCX (Max. 10MB)</span
-                  >
-                </div>
-
-                <div v-if="archivosCargando" class="loading-files">
-                  <p>Cargando archivos...</p>
-                </div>
-
-                <div v-else-if="archivos.length === 0" class="no-files">
-                  <p>No hay archivos adjuntos</p>
-                </div>
-
-                <div v-else class="archivos-list">
-                  <div
-                    v-for="(archivo, index) in archivos"
-                    :key="index"
-                    class="archivo-item"
-                  >
-                    <div class="archivo-info">
-                      <i :class="getFileIcon(archivo.tipo)"></i>
-                      <span class="archivo-nombre">{{ archivo.nombre }}</span>
-                      <span class="archivo-fecha">{{
-                        formatDate(archivo.fecha)
-                      }}</span>
-                      <span class="archivo-tamano">{{
-                        formatFileSize(archivo.tamano)
-                      }}</span>
-                    </div>
-                    <div class="archivo-acciones">
-                      <button
-                        @click="descargarArchivo(archivo)"
-                        class="action-button small"
-                      >
-                        <i class="fas fa-download"></i>
-                      </button>
-                      <button
-                        @click="previsualizarArchivo(archivo)"
-                        class="action-button small"
-                      >
-                        <i class="fas fa-eye"></i>
-                      </button>
-                      <button
-                        @click="eliminarArchivo(archivo.id)"
-                        class="action-button small danger"
-                      >
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="detalle-section">
-              <h3>Exportación de archivos</h3>
-              <div class="botones-container">
-                <button
-                  @click="exportarPlan(fichaSeleccionada.id)"
-                  class="action-button primary"
-                >
-                  Exportar plan alimenticio
-                </button>
-                <button
-                  @click="exportarFicha(fichaSeleccionada.id)"
-                  class="action-button primary"
-                  style="margin-left: 10px"
-                >
-                  Exportar ficha
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button
-              @click="nuevaConsulta(fichaSeleccionada.id)"
-              class="action-button primary"
-            >
-              Nueva consulta
-            </button>
-            <button
-              @click="editarFicha(fichaSeleccionada.id)"
-              class="action-button secondary"
-            >
-              Editar ficha
-            </button>
-            <button
-              @click="eliminarFicha(fichaSeleccionada.id)"
-              class="action-button danger"
-            >
-              Eliminar ficha
-            </button>
-            <button
-              @click="mostrarAntropometria = true"
-              class="action-button control"
-            >
-              Agregar antropometria
-            </button>
-            <button
-              @click="mostrarHistorial = true"
-              class="action-button history"
-            >
-              Ver Historial Clínico
-            </button>
-            <button
-              @click="compartirFicha(fichaSeleccionada)"
-              class="action-button secondary"
-            >
-              Compartir por correo
-            </button>
-            <button @click="closeModal" class="action-button cancel">
-              Cerrar
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <ControlPeriodico
-        v-if="mostrarAntropometria"
-        :ficha-id="fichaSeleccionada.id"
-        @control-guardado="actualizarControles"
-        @cerrar="mostrarAntropometria = false"
-      />
-      <HistorialClinico
-        v-if="mostrarHistorial"
-        :paciente-id="fichaSeleccionada.id"
-        @cerrar="mostrarHistorial = false"
-      />
-      <NotasSeguimiento
-        v-if="mostrarNotas"
-        :paciente-id="fichaSeleccionada.id"
-        @cerrar="mostrarNotas = false"
-      />
+    <div v-if="loading" class="loading">Cargando fichas...</div>
+    <div v-else-if="fichas.length === 0" class="no-results">
+      No hay fichas registradas.
     </div>
+
+    <div v-else class="fichas-grid">
+      <div v-for="ficha in fichas" :key="ficha.id" class="ficha-card">
+        <h3 class="text-dark">
+          {{ ficha.fkUsuario?.nombre || "Nombre no disponible" }}
+        </h3>
+        <p class="text-dark">
+          <strong>RUT:</strong> {{ ficha.fkUsuario?.rut || "No disponible" }}
+        </p>
+        <p class="text-dark">
+          <strong>Correo:</strong>
+          {{ ficha.fkUsuario?.correo || "No disponible" }}
+        </p>
+        <p class="text-dark">
+          <strong>Teléfono:</strong>
+          {{ ficha.fkUsuario?.telefono || "No disponible" }}
+        </p>
+        <button @click="verDetalle(ficha)" class="action-button primary">
+          Ver detalles
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal detalle -->
+    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>
+            Ficha de
+            {{ fichaSeleccionada?.fkUsuario?.nombre || "No disponible" }}
+          </h2>
+          <button @click="closeModal" class="close-button">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Datos Personales -->
+          <div class="detalle-section">
+            <h3>Datos Personales</h3>
+            <p>
+              RUT: {{ fichaSeleccionada?.fkUsuario?.rut || "No disponible" }}
+            </p>
+            <p>
+              Edad:
+              {{ calcularEdad(fichaSeleccionada?.fkUsuario?.fechaNacimiento) }}
+            </p>
+            <p>
+              Sexo: {{ fichaSeleccionada?.fkUsuario?.sexo || "No disponible" }}
+            </p>
+            <p>
+              Teléfono:
+              {{ fichaSeleccionada?.fkUsuario?.telefono || "No disponible" }}
+            </p>
+            <p>
+              Email:
+              {{ fichaSeleccionada?.fkUsuario?.correo || "No disponible" }}
+            </p>
+          </div>
+
+          <!-- Anamnesis Social -->
+          <div class="detalle-section">
+            <h3>Anamnesis Social</h3>
+            <p>
+              Asiste con:
+              {{
+                fichaSeleccionada?.fkAnamnesisSocial?.asisteCon ||
+                "No disponible"
+              }}
+            </p>
+            <p>
+              Hijos:
+              {{
+                fichaSeleccionada?.fkAnamnesisSocial?.hijos || "No disponible"
+              }}
+            </p>
+            <p>
+              Vive con:
+              {{
+                fichaSeleccionada?.fkAnamnesisSocial?.viveCon || "No disponible"
+              }}
+            </p>
+            <p>
+              Ocupación:
+              {{
+                fichaSeleccionada?.fkAnamnesisSocial?.ocupacion ||
+                "No disponible"
+              }}
+            </p>
+            <p>
+              Escolaridad:
+              {{
+                fichaSeleccionada?.fkAnamnesisSocial?.escolaridad ||
+                "No disponible"
+              }}
+            </p>
+            <p>
+              Redes de apoyo:
+              {{
+                fichaSeleccionada?.fkAnamnesisSocial?.redesDeApoyo ||
+                "No disponible"
+              }}
+            </p>
+            <p>
+              Servicios básicos:
+              {{
+                fichaSeleccionada?.fkAnamnesisSocial?.serviciosBasicos ||
+                "No disponible"
+              }}
+            </p>
+          </div>
+
+          <!-- Anamnesis Clínica -->
+          <div class="detalle-section">
+            <h3>Anamnesis Clínica</h3>
+            <p>
+              Antecedente Familiar:
+              {{
+                fichaSeleccionada?.fkAnamnesisClinica?.antecedenteFamiliar ||
+                "No disponible"
+              }}
+            </p>
+            <p>
+              Patología Base:
+              {{
+                fichaSeleccionada?.fkAnamnesisClinica?.patologiaBase ||
+                "No disponible"
+              }}
+            </p>
+            <p>
+              Medicamentos:
+              {{
+                fichaSeleccionada?.fkAnamnesisClinica?.medicamento ||
+                "No disponible"
+              }}
+            </p>
+            <p>
+              Cirugías:
+              {{
+                fichaSeleccionada?.fkAnamnesisClinica?.antecedenteQuirurgico ||
+                fichaSeleccionada?.fkAnamnesisClinica?.anetecedenteQuirurgico ||
+                "No disponible"
+              }}
+            </p>
+            <p>
+              Alergias:
+              {{
+                fichaSeleccionada?.fkAnamnesisClinica?.alergia ||
+                "No disponible"
+              }}
+            </p>
+          </div>
+
+          <!-- Anamnesis Alimentaria -->
+          <div class="detalle-section">
+            <h3>Anamnesis Alimentaria</h3>
+            <p>
+              Alergia / Intolerancia:
+              {{
+                fichaSeleccionada?.fkAnamnesisAlimentaria
+                  ?.alergiaIntolerancia || "No disponible"
+              }}
+            </p>
+            <p>
+              No le gusta:
+              {{
+                fichaSeleccionada?.fkAnamnesisAlimentaria?.alimentoNoGusta ||
+                "No disponible"
+              }}
+            </p>
+            <p>
+              Preferencias:
+              {{
+                fichaSeleccionada?.fkAnamnesisAlimentaria
+                  ?.alimentoPreferencia || "No disponible"
+              }}
+            </p>
+            <p>
+              Cocina en casa:
+              {{
+                fichaSeleccionada?.fkAnamnesisAlimentaria?.cocinaEnCasa ||
+                "No disponible"
+              }}
+            </p>
+            <p>
+              Habitualmente come en:
+              {{
+                fichaSeleccionada?.fkAnamnesisAlimentaria
+                  ?.habitualmenteComeEn || "No disponible"
+              }}
+            </p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button @click="abrirAntropometria" class="action-button control">
+            Agregar Antropometría
+          </button>
+          <button @click="editarFicha" class="action-button secondary">
+            Editar ficha
+          </button>
+          <button @click="eliminarFicha" class="action-button danger">
+            Eliminar ficha
+          </button>
+          <button @click="closeModal" class="action-button cancel">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de antropometría -->
+    <ControlPeriodico
+      v-if="showAntropometria"
+      :ficha-id="fichaSeleccionada.id"
+      @control-guardado="actualizarControles"
+      @cerrar="showAntropometria = false"
+    />
   </div>
 </template>
 
 <script>
+import axios from "axios";
 import ControlPeriodico from "./ControlPeriodico.vue";
-import HistorialClinico from "@/components/HistorialClinico.vue";
-import NotasSeguimiento from "@/components/NotasSeguimiento.vue";
-import GraficaEvolucion from "@/components/GraficaEvolucion.vue";
-
 export default {
-  name: "BusquedaFichas",
-  components: {
-    ControlPeriodico,
-    HistorialClinico,
-    NotasSeguimiento,
-    GraficaEvolucion,
-  },
   data() {
     return {
-      searchTerm: "",
-      loading: false,
       fichas: [],
-      sortBy: "fecha",
-      filtroEstado: "todos",
-      paginaActual: 1,
-      itemsPorPagina: 6,
+      loading: false,
       showModal: false,
-      fichaSeleccionada: {},
-      mostrarAntropometria: false,
-      mostrarHistorial: false,
-      archivos: [],
-      archivosCargando: false,
+      fichaSeleccionada: null,
+      showAntropometria: false,
+      nuevoControl: { peso: null, altura: null },
     };
   },
-  computed: {
-    fichasFiltradas() {
-      let resultado = [...this.fichas];
-
-      // Filtro por estado
-      if (this.filtroEstado !== "todos") {
-        resultado = resultado.filter(
-          (ficha) => ficha.estado === this.filtroEstado
-        );
-      }
-
-      return resultado;
-    },
-    fichasOrdenadas() {
-      let resultado = [...this.fichasFiltradas];
-
-      // Ordenamiento
-      if (this.sortBy === "fecha") {
-        resultado.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-      } else if (this.sortBy === "nombre") {
-        resultado.sort((a, b) => a.nombre.localeCompare(b.nombre));
-      } else if (this.sortBy === "rut") {
-        resultado.sort((a, b) => a.rut.localeCompare(b.rut));
-      }
-
-      // Paginación
-      const inicio = (this.paginaActual - 1) * this.itemsPorPagina;
-      const fin = inicio + this.itemsPorPagina;
-
-      return resultado.slice(inicio, fin);
-    },
-    totalPaginas() {
-      return Math.ceil(this.fichasFiltradas.length / this.itemsPorPagina);
-    },
+  components: {
+    ControlPeriodico,
   },
   mounted() {
-    this.cargarDatosEjemplo();
-    // Simular carga de archivos existentes
-    this.archivosCargando = true;
-    setTimeout(() => {
-      this.archivos = [
-        {
-          id: 1,
-          nombre: "Analisis_sangre.pdf",
-          tipo: "application/pdf",
-          tamano: 245760,
-          fecha: "2023-05-15",
-          url: "#",
-        },
-        {
-          id: 2,
-          nombre: "Receta_medica.docx",
-          tipo: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          tamano: 512000,
-          fecha: "2023-06-20",
-          url: "#",
-        },
-        {
-          id: 3,
-          nombre: "Foto_progreso.jpg",
-          tipo: "image/jpeg",
-          tamano: 1024000,
-          fecha: "2023-07-10",
-          url: "#",
-        },
-      ];
-      this.archivosCargando = false;
-    }, 1000);
+    this.obtenerFichas();
   },
   methods: {
-    buscarFichas() {
+    abrirAntropometria() {
+      this.showAntropometria = true;
+      console.log(this.fichaSeleccionada.id);
+    },
+    actualizarControles(nuevoControl) {
+      if (!this.fichaSeleccionada.antropometrias) {
+        this.fichaSeleccionada.antropometrias = [];
+      }
+      this.fichaSeleccionada.antropometrias.push(nuevoControl);
+      this.showAntropometria = false;
+    },
+    async obtenerFichas() {
       this.loading = true;
-
-      // Simulamos una búsqueda en base de datos
-      setTimeout(() => {
-        if (this.searchTerm) {
-          this.fichas = this.fichas.filter(
-            (ficha) =>
-              ficha.rut.includes(this.searchTerm) ||
-              ficha.nombre.toLowerCase().includes(this.searchTerm.toLowerCase())
-          );
-        } else {
-          // Si no hay término de búsqueda, recargamos todos los datos
-          this.cargarDatosEjemplo();
-        }
-
-        this.paginaActual = 1;
+      try {
+        const res = await axios.get(`${process.env.VUE_APP_API_URL}/ficha`);
+        this.fichas = res.data;
+      } catch (err) {
+        console.error("Error al obtener fichas:", err);
+      } finally {
         this.loading = false;
-      }, 500);
-    },
-    cargarDatosEjemplo() {
-      // Datos de ejemplo para mostrar la funcionalidad
-      this.fichas = [
-        {
-          id: 1,
-          nombre: "Juan Pérez González",
-          rut: "12.345.678-9",
-          edad: 35,
-          sexo: "Masculino",
-          telefono: "+56 9 1234 5678",
-          email: "juan.perez@ejemplo.com",
-          fecha: "2023-04-15",
-          imc: "24.5",
-          estado: "activo",
-          historial: [
-            {
-              fecha: "2023-04-15",
-              peso: 78.5,
-              altura: 179,
-              imc: 24.5,
-              observaciones:
-                "Paciente con buena adherencia al plan. Se observa disminución de peso respecto a la consulta anterior.",
-              plan: "Seguir con plan de alimentación balanceado. Incrementar la actividad física a 4 días por semana.",
-            },
-            {
-              fecha: "2023-02-10",
-              peso: 80.2,
-              altura: 179,
-              imc: 25.0,
-              observaciones:
-                "Paciente refiere ansiedad por alimentos dulces en las tardes.",
-              plan: "Ajuste de plan alimentario incluyendo colaciones saludables para controlar ansiedad.",
-            },
-          ],
-        },
-        {
-          id: 2,
-          nombre: "María Fernández López",
-          rut: "18.765.432-1",
-          edad: 28,
-          sexo: "Femenino",
-          telefono: "+56 9 8765 4321",
-          email: "maria.fernandez@ejemplo.com",
-          fecha: "2023-05-20",
-          imc: "22.1",
-          estado: "activo",
-          historial: [
-            {
-              fecha: "2023-05-20",
-              peso: 58.3,
-              altura: 162,
-              imc: 22.1,
-              observaciones:
-                "Paciente busca mejorar hábitos alimentarios. Sin patologías de base.",
-              plan: "Plan alimentario de 1800 kcal con distribución adecuada de macronutrientes.",
-            },
-          ],
-        },
-        {
-          id: 3,
-          nombre: "Roberto Soto Mendoza",
-          rut: "9.876.543-2",
-          edad: 45,
-          sexo: "Masculino",
-          telefono: "+56 9 5432 1098",
-          email: "roberto.soto@ejemplo.com",
-          fecha: "2023-03-05",
-          imc: "27.8",
-          estado: "inactivo",
-          historial: [
-            {
-              fecha: "2023-03-05",
-              peso: 85.4,
-              altura: 175,
-              imc: 27.8,
-              observaciones:
-                "Paciente con sobrepeso y presión arterial elevada. Requiere reducción de sodio en la dieta.",
-              plan: "Plan DASH modificado con restricción de sodio y control de carbohidratos refinados.",
-            },
-            {
-              fecha: "2023-01-15",
-              peso: 87.2,
-              altura: 175,
-              imc: 28.4,
-              observaciones:
-                "Evaluación inicial. Paciente con antecedentes familiares de hipertensión.",
-              plan: "Plan alimentario hipocalórico con reducción moderada de sodio.",
-            },
-          ],
-        },
-        {
-          id: 4,
-          nombre: "Laura Gutiérrez Vega",
-          rut: "14.852.963-7",
-          edad: 31,
-          sexo: "Femenino",
-          telefono: "+56 9 7485 2369",
-          email: "laura.gutierrez@ejemplo.com",
-          fecha: "2023-06-10",
-          imc: "20.8",
-          estado: "activo",
-          historial: [
-            {
-              fecha: "2023-06-10",
-              peso: 54.1,
-              altura: 161,
-              imc: 20.8,
-              observaciones:
-                "Paciente vegetariana que busca mejorar su composición corporal y aumentar masa muscular.",
-              plan: "Plan vegetariano con adecuada ingesta proteica y suplementación de B12.",
-            },
-          ],
-        },
-        {
-          id: 5,
-          nombre: "Carlos Muñoz Rojas",
-          rut: "16.357.159-5",
-          edad: 42,
-          sexo: "Masculino",
-          telefono: "+56 9 3571 5980",
-          email: "carlos.munoz@ejemplo.com",
-          fecha: "2023-02-25",
-          imc: "30.2",
-          estado: "activo",
-          historial: [
-            {
-              fecha: "2023-02-25",
-              peso: 96.5,
-              altura: 179,
-              imc: 30.2,
-              tipo: "Primera evaluación",
-              observaciones:
-                "Paciente con obesidad grado I y resistencia a la insulina.",
-              plan: "Plan de alimentación con control de índice glicémico y porciones.",
-            },
-          ],
-        },
-        {
-          id: 6,
-          nombre: "Ana López Silva",
-          rut: "19.753.159-8",
-          edad: 25,
-          sexo: "Femenino",
-          telefono: "+56 9 1598 7532",
-          email: "ana.lopez@ejemplo.com",
-          fecha: "2023-05-05",
-          imc: "19.5",
-          estado: "activo",
-          historial: [
-            {
-              fecha: "2023-05-05",
-              peso: 50.2,
-              altura: 160,
-              imc: 19.5,
-              observaciones:
-                "Paciente busca mejorar alimentación para rendimiento deportivo (runner).",
-              plan: "Plan de alimentación adaptado a sus necesidades deportivas con distribución adecuada de macros.",
-            },
-          ],
-        },
-        {
-          id: 7,
-          nombre: "Daniel Castro Bravo",
-          rut: "15.987.654-3",
-          edad: 38,
-          sexo: "Masculino",
-          telefono: "+56 9 8765 4321",
-          email: "daniel.castro@ejemplo.com",
-          fecha: "2023-01-30",
-          imc: "26.4",
-          estado: "inactivo",
-          historial: [
-            {
-              fecha: "2023-01-30",
-              peso: 82.5,
-              altura: 177,
-              imc: 26.4,
-              observaciones:
-                "Paciente con antecedentes de colesterol elevado. Busca mejorar su perfil lipídico.",
-              plan: "Plan alimentario con control de grasas saturadas y aumento de ácidos grasos omega 3.",
-            },
-          ],
-        },
-      ];
-    },
-    formatDate(dateString) {
-      const options = { day: "2-digit", month: "2-digit", year: "numeric" };
-      return new Date(dateString).toLocaleDateString("es-CL", options);
-    },
-    cambiarPagina(pagina) {
-      if (pagina >= 1 && pagina <= this.totalPaginas) {
-        this.paginaActual = pagina;
       }
     },
-    verDetalle(id) {
-      const ficha = this.fichas.find((f) => f.id === id);
-      if (ficha) {
-        this.fichaSeleccionada = { ...ficha };
-        this.showModal = true;
-      }
+    verDetalle(ficha) {
+      this.fichaSeleccionada = ficha;
+      this.showModal = true;
     },
     closeModal() {
       this.showModal = false;
     },
-    nuevaConsulta(id) {
-      alert(`Redirigiendo a nueva consulta para paciente ID: ${id}`);
-    },
-    editarFicha(id) {
-      this.$router.push({ name: "EditarFicha", params: { id } });
-    },
-    eliminarFicha(id) {
-      alert(`borrando ficha del paciente ID: ${id}`);
-    },
-    exportarPlan(id) {
-      alert(`Exportando plan alimenticio de ficha con ID: ${id}`);
-    },
-    exportarFicha(id) {
-      alert(`Exportando ficha con ID: ${id}`);
-    },
-    actualizarControles(nuevoControl) {
-      if (!this.fichaSeleccionada.historial) {
-        this.fichaSeleccionada.historial = [];
+    calcularEdad(fechaNacimiento) {
+      if (!fechaNacimiento) return "No disponible";
+      const nacimiento = new Date(fechaNacimiento);
+      const hoy = new Date();
+      let edad = hoy.getFullYear() - nacimiento.getFullYear();
+      const m = hoy.getMonth() - nacimiento.getMonth();
+      if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+        edad--;
       }
-      this.fichaSeleccionada.historial.push(nuevoControl);
-      this.mostrarAntropometria = false;
+      return edad;
     },
-    // Métodos para manejo de archivos
-    triggerFileInput() {
-      this.$refs.fileInput.click();
+    editarFicha() {
+      alert("Redirigir a editar ficha (aún no implementado)");
     },
-    handleFileUpload(event) {
-      const files = event.target.files;
-      if (files.length > 0) {
-        this.subirArchivos(files);
-      }
+    eliminarFicha() {
+      alert("Lógica para eliminar ficha (aún no implementado)");
     },
-    async subirArchivos(files) {
-      this.archivosCargando = true;
-      try {
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-
-          if (file.size > 10 * 1024 * 1024) {
-            alert(`El archivo ${file.name} excede el tamaño máximo de 10MB`);
-            continue;
-          }
-
-          const validTypes = [
-            "application/pdf",
-            "image/jpeg",
-            "image/png",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          ];
-          if (!validTypes.includes(file.type)) {
-            alert(`El formato de ${file.name} no está permitido`);
-            continue;
-          }
-
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-
-          this.archivos.push({
-            id: Date.now() + i,
-            nombre: file.name,
-            tipo: file.type,
-            tamano: file.size,
-            fecha: new Date().toISOString(),
-            url: URL.createObjectURL(file),
-          });
-        }
-      } catch (error) {
-        console.error("Error al subir archivos:", error);
-        alert("Error al subir archivos");
-      } finally {
-        this.archivosCargando = false;
-        this.$refs.fileInput.value = "";
-      }
+    abrirAntropometriaModal() {
+      this.showAntropometria = true;
     },
-    descargarArchivo(archivo) {
-      const link = document.createElement("a");
-      link.href = archivo.url;
-      link.download = archivo.nombre;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    closeAntropometria() {
+      this.showAntropometria = false;
     },
-    previsualizarArchivo(archivo) {
-      if (archivo.tipo.includes("image")) {
-        window.open(archivo.url, "_blank");
-      } else if (archivo.tipo === "application/pdf") {
-        window.open(archivo.url, "_blank");
-      } else {
-        alert("Vista previa no disponible para este tipo de archivo");
-      }
-    },
-    async eliminarArchivo(id) {
-      if (confirm("¿Está seguro que desea eliminar este archivo?")) {
-        try {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          this.archivos = this.archivos.filter((a) => a.id !== id);
-        } catch (error) {
-          console.error("Error al eliminar archivo:", error);
-          alert("Error al eliminar archivo");
-        }
-      }
-    },
-    getFileIcon(tipo) {
-      if (tipo.includes("image")) return "fas fa-file-image";
-      if (tipo === "application/pdf") return "fas fa-file-pdf";
-      if (tipo.includes("word")) return "fas fa-file-word";
-      return "fas fa-file";
-    },
-    formatFileSize(bytes) {
-      if (bytes === 0) return "0 Bytes";
-      const k = 1024;
-      const sizes = ["Bytes", "KB", "MB", "GB"];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-    },
-    compartirFicha(ficha) {
-      const emailDestino = prompt(
-        `Ingrese el correo al que desea enviar la ficha de ${ficha.nombre}:`
-      );
-      if (!emailDestino) return;
-
-      // Simulación de envío por correo
-      alert(
-        `Se ha enviado la ficha del paciente "${ficha.nombre}" al correo: ${emailDestino}`
-      );
+    guardarAntropometria() {
+      console.log("Guardar antropometría:", this.nuevoControl);
+      this.closeAntropometria();
+      alert("Antropometría guardada (simulado)");
     },
   },
 };
