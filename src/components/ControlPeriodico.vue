@@ -2,60 +2,154 @@
   <div class="modal-overlay" @click.self="cerrarModal">
     <div class="modal-container">
       <div class="modal-header">
-        <h3>Nuevo Control Periódico</h3>
+        <h3>Nuevo Registro Antropométrico</h3>
         <button @click="cerrarModal" class="close-button">&times;</button>
       </div>
-      
-      <form @submit.prevent="guardarControl" class="control-form">
-        <div class="form-group">
-          <label>Fecha del control</label>
-          <input v-model="control.fecha" type="date" required class="form-input">
-        </div>
-        
+
+      <form @submit.prevent="guardarAntropometria" class="control-form">
         <div class="form-group">
           <label>Peso (kg)</label>
-          <input v-model.number="control.peso" type="number" step="0.1" required class="form-input">
+          <input
+            v-model="peso"
+            type="number"
+            step="0.1"
+            required
+            class="form-input"
+          />
         </div>
-        
+
         <div class="form-group">
           <label>Altura (cm)</label>
-          <input v-model.number="control.altura" type="number" step="0.1" required class="form-input">
+          <input
+            v-model="talla"
+            type="number"
+            step="0.1"
+            required
+            class="form-input"
+          />
         </div>
-        
+
         <div class="form-group">
           <label>IMC (calculado)</label>
-          <input :value="calcularIMC" disabled class="form-input disabled">
+          <input :value="calcularIMC" disabled class="form-input disabled" />
         </div>
-        
+
+        <!-- Campos de pliegues y circunferencias -->
         <div class="form-group">
-          <label>Adherencia al tratamiento</label>
-          <select v-model="control.adherencia" required class="form-input">
-            <option value="">Seleccione...</option>
-            <option value="alta">Alta</option>
-            <option value="media">Media</option>
-            <option value="baja">Baja</option>
-          </select>
+          <label>Circunferencia de cintura (cm)</label>
+          <input
+            v-model="tomaPliegue.circunferenciaCintura"
+            type="number"
+            step="0.1"
+            class="form-input"
+          />
         </div>
-        
+
         <div class="form-group">
-          <label>Observaciones</label>
-          <textarea v-model="control.observaciones" required class="form-textarea" 
-                   placeholder="Ej: Evolución del paciente, cambios observados..."></textarea>
+          <label>Circunferencia braquial (cm)</label>
+          <input
+            v-model="tomaPliegue.circunferenciaBraquial"
+            type="number"
+            step="0.1"
+            class="form-input"
+          />
         </div>
-        
+
         <div class="form-group">
-          <label>Plan de seguimiento</label>
-          <textarea v-model="control.plan" required class="form-textarea" 
-                   placeholder="Ej: Ajustes al plan alimentario, recomendaciones..."></textarea>
+          <label>Circunferencia cadera (cm)</label>
+          <input
+            v-model="tomaPliegue.circunferenciaCadera"
+            type="number"
+            step="0.1"
+            class="form-input"
+          />
         </div>
-        
+
+        <div class="form-group">
+          <label>Circunferencia pantorrilla (cm)</label>
+          <input
+            v-model="tomaPliegue.circunferenciaPantorrilla"
+            type="number"
+            step="0.1"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Pliegue bicipital (mm)</label>
+          <input
+            v-model="tomaPliegue.pliegueBicipital"
+            type="number"
+            step="0.1"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Pliegue tricipital (mm)</label>
+          <input
+            v-model="tomaPliegue.pliegueTricipital"
+            type="number"
+            step="0.1"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Pliegue subescapular (mm)</label>
+          <input
+            v-model="tomaPliegue.pliegueSubescapular"
+            type="number"
+            step="0.1"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Pliegue suprailiaco (mm)</label>
+          <input
+            v-model="tomaPliegue.pliegueSuprailiaco"
+            type="number"
+            step="0.1"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Pliegue abdominal (mm)</label>
+          <input
+            v-model="tomaPliegue.pliegueAbdominal"
+            type="number"
+            step="0.1"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Pliegue muslo (mm)</label>
+          <input
+            v-model="tomaPliegue.pliegueMuslo"
+            type="number"
+            step="0.1"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Pliegue pantorrilla (mm)</label>
+          <input
+            v-model="tomaPliegue.plieguePantorrilla"
+            type="number"
+            step="0.1"
+            class="form-input"
+          />
+        </div>
+
         <div class="form-actions">
           <button type="button" @click="cerrarModal" class="cancel-button">
             Cancelar
           </button>
-          <button type="submit" class="submit-button">
-            Guardar Control
-          </button>
+          <button type="submit" class="submit-button">Guardar</button>
         </div>
       </form>
     </div>
@@ -63,94 +157,69 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   props: {
     fichaId: {
-      type: String,
-      required: true
-    }
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
-      control: {
-        fichaId: this.fichaId,
-        fecha: new Date().toISOString().substr(0, 10),
-        peso: null,
-        altura: null,
-        imc: null,
-        adherencia: '',
-        observaciones: '',
-        plan: ''
-      }
-    }
+      peso: null,
+      talla: null,
+      tomaPliegue: {
+        circunferenciaCintura: "",
+        circunferenciaBraquial: "",
+        circunferenciaCadera: "",
+        circunferenciaPantorrilla: "",
+        pliegueBicipital: "",
+        pliegueTricipital: "",
+        pliegueSubescapular: "",
+        pliegueSuprailiaco: "",
+        pliegueAbdominal: "",
+        pliegueMuslo: "",
+        plieguePantorrilla: "",
+      },
+    };
   },
   computed: {
     calcularIMC() {
-      if (!this.control.peso || !this.control.altura) return '';
-      const alturaM = this.control.altura / 100;
-      return (this.control.peso / (alturaM * alturaM)).toFixed(2);
-    }
+      if (!this.peso || !this.talla) return "";
+      const alturaM = this.talla / 100;
+      return (this.peso / (alturaM * alturaM)).toFixed(2);
+    },
   },
   methods: {
     cerrarModal() {
-      this.$emit('cerrar');
+      this.$emit("cerrar");
     },
-    async guardarControl() {
-      if (!this.validarFormulario()) return;
-      
+    async guardarAntropometria() {
       try {
-        // Calcular IMC antes de guardar
-        this.control.imc = this.calcularIMC;
-        
-        // Emitir el evento con los datos del control
-        this.$emit('control-guardado', this.control);
-        
-        // Resetear el formulario
-        this.control = {
-          fichaId: this.fichaId,
-          fecha: new Date().toISOString().substr(0, 10),
-          peso: null,
-          altura: null,
-          imc: null,
-          adherencia: '',
-          observaciones: '',
-          plan: ''
+        const payload = {
+          peso: this.peso.toString(),
+          imc: this.calcularIMC.toString(),
+          talla: this.talla.toString(),
+          fkFicha: this.fichaId,
+          tomaPliegue: this.tomaPliegue,
         };
-        
+
+        await axios.post(
+          `${process.env.VUE_APP_API_URL}/v1/antropometria`,
+          payload
+        );
+        alert("Registro guardado correctamente");
+        this.$emit("guardado");
+        this.cerrarModal();
       } catch (error) {
-        console.error('Error al guardar control:', error);
-        alert('Ocurrió un error al guardar el control');
+        console.error("Error al guardar:", error);
+        alert("Error al guardar el registro");
       }
     },
-    validarFormulario() {
-      if (!this.control.fecha) {
-        alert('Por favor ingrese la fecha del control');
-        return false;
-      }
-      if (!this.control.peso || this.control.peso <= 0) {
-        alert('Por favor ingrese un peso válido');
-        return false;
-      }
-      if (!this.control.altura || this.control.altura <= 0) {
-        alert('Por favor ingrese una altura válida');
-        return false;
-      }
-      if (!this.control.adherencia) {
-        alert('Por favor seleccione la adherencia al tratamiento');
-        return false;
-      }
-      if (!this.control.observaciones) {
-        alert('Por favor ingrese observaciones');
-        return false;
-      }
-      if (!this.control.plan) {
-        alert('Por favor ingrese un plan de seguimiento');
-        return false;
-      }
-      return true;
-    }
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
@@ -257,7 +326,7 @@ export default {
 
 .submit-button {
   padding: 0.75rem 1.5rem;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
   border-radius: 6px;
@@ -291,12 +360,13 @@ export default {
   .modal-container {
     width: 95%;
   }
-  
+
   .form-actions {
     flex-direction: column;
   }
-  
-  .submit-button, .cancel-button {
+
+  .submit-button,
+  .cancel-button {
     width: 100%;
   }
 }

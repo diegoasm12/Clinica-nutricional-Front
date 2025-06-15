@@ -4,16 +4,16 @@
       <div class="search-header">
         <h2 class="section-title">Búsqueda de Fichas Nutricionales</h2>
         <div class="search-box">
-          <input 
-            v-model="searchTerm" 
-            @keyup.enter="buscarFichas" 
-            placeholder="Buscar por RUT o nombre del paciente" 
+          <input
+            v-model="searchTerm"
+            @keyup.enter="buscarFichas"
+            placeholder="Buscar por RUT o nombre del paciente"
             class="search-input"
           />
           <button @click="buscarFichas" class="search-button">Buscar</button>
         </div>
       </div>
-      
+
       <!-- Filtros adicionales -->
       <div class="filters-section">
         <div class="filter-group">
@@ -24,7 +24,7 @@
             <option value="rut">RUT</option>
           </select>
         </div>
-        
+
         <div class="filter-group">
           <label>Estado:</label>
           <select v-model="filtroEstado" class="filter-select">
@@ -34,60 +34,80 @@
           </select>
         </div>
       </div>
-      
+
       <!-- Resultados de la búsqueda -->
       <div v-if="loading" class="loading">
         <p>Cargando fichas...</p>
       </div>
-      
+
       <div v-else-if="fichas.length === 0" class="no-results">
         <p>No se encontraron fichas. Intente con otra búsqueda.</p>
       </div>
-      
+
       <div v-else class="results-section">
-        <h3 class="results-title">{{ fichas.length }} resultados encontrados</h3>
-        
+        <h3 class="results-title">
+          {{ fichas.length }} resultados encontrados
+        </h3>
+
         <div class="fichas-grid">
-          <div v-for="ficha in fichasOrdenadas" :key="ficha.id" class="ficha-card" :class="{ 'inactivo': ficha.estado === 'inactivo' }">
+          <div
+            v-for="ficha in fichasOrdenadas"
+            :key="ficha.id"
+            class="ficha-card"
+            :class="{ inactivo: ficha.estado === 'inactivo' }"
+          >
             <div class="ficha-header">
               <h3>{{ ficha.nombre }}</h3>
-              <span class="estado-badge" :class="ficha.estado">{{ ficha.estado === 'activo' ? 'Activo' : 'Inactivo' }}</span>
+              <span class="estado-badge" :class="ficha.estado">{{
+                ficha.estado === "activo" ? "Activo" : "Inactivo"
+              }}</span>
             </div>
-            
+
             <div class="ficha-info">
               <p><strong>RUT:</strong> {{ ficha.rut }}</p>
               <p><strong>Edad:</strong> {{ ficha.edad }} años</p>
-              <p><strong>Última consulta:</strong> {{ formatDate(ficha.fecha) }}</p>
+              <p>
+                <strong>Última consulta:</strong> {{ formatDate(ficha.fecha) }}
+              </p>
               <p><strong>IMC actual:</strong> {{ ficha.imc }}</p>
             </div>
-            
+
             <div class="ficha-actions">
-              <button @click="verDetalle(ficha.id)" class="action-button view">Ver detalles</button>
-              <button @click="nuevaConsulta(ficha.id)" class="action-button primary">Nueva consulta</button>
+              <button @click="verDetalle(ficha.id)" class="action-button view">
+                Ver detalles
+              </button>
+              <button
+                @click="nuevaConsulta(ficha.id)"
+                class="action-button primary"
+              >
+                Nueva consulta
+              </button>
             </div>
           </div>
         </div>
-        
+
         <!-- Paginación -->
         <div class="pagination">
-          <button 
-            @click="cambiarPagina(paginaActual - 1)" 
-            :disabled="paginaActual === 1" 
+          <button
+            @click="cambiarPagina(paginaActual - 1)"
+            :disabled="paginaActual === 1"
             class="pagination-button"
           >
             Anterior
           </button>
-          <span class="pagination-info">Página {{ paginaActual }} de {{ totalPaginas }}</span>
-          <button 
-            @click="cambiarPagina(paginaActual + 1)" 
-            :disabled="paginaActual === totalPaginas" 
+          <span class="pagination-info"
+            >Página {{ paginaActual }} de {{ totalPaginas }}</span
+          >
+          <button
+            @click="cambiarPagina(paginaActual + 1)"
+            :disabled="paginaActual === totalPaginas"
             class="pagination-button"
           >
             Siguiente
           </button>
         </div>
       </div>
-      
+
       <!-- Modal detalle ficha -->
       <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
         <div class="modal-content">
@@ -95,7 +115,7 @@
             <h2>Ficha de {{ fichaSeleccionada.nombre }}</h2>
             <button @click="closeModal" class="close-button">&times;</button>
           </div>
-          
+
           <div class="modal-body">
             <div class="detalle-section">
               <h3>Datos Personales</h3>
@@ -103,18 +123,31 @@
                 <p><strong>RUT:</strong> {{ fichaSeleccionada.rut }}</p>
                 <p><strong>Edad:</strong> {{ fichaSeleccionada.edad }} años</p>
                 <p><strong>Sexo:</strong> {{ fichaSeleccionada.sexo }}</p>
-                <p><strong>Teléfono:</strong> {{ fichaSeleccionada.telefono }}</p>
+                <p>
+                  <strong>Teléfono:</strong> {{ fichaSeleccionada.telefono }}
+                </p>
                 <p><strong>Email:</strong> {{ fichaSeleccionada.email }}</p>
               </div>
             </div>
-            
+
             <div class="detalle-section">
               <h3>Historial de Consultas</h3>
-              <div v-if="fichaSeleccionada.historial && fichaSeleccionada.historial.length">
-                <div v-for="(consulta, index) in fichaSeleccionada.historial" :key="index" class="consulta-item">
+              <div
+                v-if="
+                  fichaSeleccionada.historial &&
+                  fichaSeleccionada.historial.length
+                "
+              >
+                <div
+                  v-for="(consulta, index) in fichaSeleccionada.historial"
+                  :key="index"
+                  class="consulta-item"
+                >
                   <div class="consulta-header">
                     <h4>Consulta {{ formatDate(consulta.fecha) }}</h4>
-                    <span class="consulta-tag">{{ consulta.tipo || 'Control' }}</span>
+                    <span class="consulta-tag">{{
+                      consulta.tipo || "Control"
+                    }}</span>
                   </div>
                   <div class="consulta-datos">
                     <p><strong>Peso:</strong> {{ consulta.peso }} kg</p>
@@ -122,14 +155,28 @@
                     <p><strong>IMC:</strong> {{ consulta.imc }}</p>
                   </div>
                   <div class="consulta-notas">
-                    <button @click="mostrarNotas = true" class="action-button history">Ver Notas de Seguimiento</button>
-                    <p><strong>Observaciones:</strong> {{ consulta.observaciones }}</p>
+                    <button
+                      @click="mostrarNotas = true"
+                      class="action-button history"
+                    >
+                      Ver Notas de Seguimiento
+                    </button>
+                    <p>
+                      <strong>Observaciones:</strong>
+                      {{ consulta.observaciones }}
+                    </p>
                     <p><strong>Plan:</strong> {{ consulta.plan }}</p>
                   </div>
                 </div>
               </div>
-              <div class="detalle-section" v-if="fichaSeleccionada.historial && fichaSeleccionada.historial.length > 0">
-              <GraficaEvolucion :historial="fichaSeleccionada.historial" />
+              <div
+                class="detalle-section"
+                v-if="
+                  fichaSeleccionada.historial &&
+                  fichaSeleccionada.historial.length > 0
+                "
+              >
+                <GraficaEvolucion :historial="fichaSeleccionada.historial" />
               </div>
 
               <div v-else class="no-data">
@@ -141,44 +188,63 @@
               <h3>Archivos Adjuntos</h3>
               <div class="archivos-container">
                 <div class="subir-archivo">
-                  <input 
-                    type="file" 
-                    id="fileInput" 
-                    ref="fileInput" 
-                    @change="handleFileUpload" 
-                    multiple 
+                  <input
+                    type="file"
+                    id="fileInput"
+                    ref="fileInput"
+                    @change="handleFileUpload"
+                    multiple
                     style="display: none"
-                  >
+                  />
                   <button @click="triggerFileInput" class="upload-button">
                     <i class="fas fa-cloud-upload-alt"></i> Subir Archivos
                   </button>
-                  <span class="upload-hint">Formatos permitidos: PDF, JPG, PNG, DOCX (Max. 10MB)</span>
+                  <span class="upload-hint"
+                    >Formatos permitidos: PDF, JPG, PNG, DOCX (Max. 10MB)</span
+                  >
                 </div>
-                
+
                 <div v-if="archivosCargando" class="loading-files">
                   <p>Cargando archivos...</p>
                 </div>
-                
+
                 <div v-else-if="archivos.length === 0" class="no-files">
                   <p>No hay archivos adjuntos</p>
                 </div>
-                
+
                 <div v-else class="archivos-list">
-                  <div v-for="(archivo, index) in archivos" :key="index" class="archivo-item">
+                  <div
+                    v-for="(archivo, index) in archivos"
+                    :key="index"
+                    class="archivo-item"
+                  >
                     <div class="archivo-info">
                       <i :class="getFileIcon(archivo.tipo)"></i>
                       <span class="archivo-nombre">{{ archivo.nombre }}</span>
-                      <span class="archivo-fecha">{{ formatDate(archivo.fecha) }}</span>
-                      <span class="archivo-tamano">{{ formatFileSize(archivo.tamano) }}</span>
+                      <span class="archivo-fecha">{{
+                        formatDate(archivo.fecha)
+                      }}</span>
+                      <span class="archivo-tamano">{{
+                        formatFileSize(archivo.tamano)
+                      }}</span>
                     </div>
                     <div class="archivo-acciones">
-                      <button @click="descargarArchivo(archivo)" class="action-button small">
+                      <button
+                        @click="descargarArchivo(archivo)"
+                        class="action-button small"
+                      >
                         <i class="fas fa-download"></i>
                       </button>
-                      <button @click="previsualizarArchivo(archivo)" class="action-button small">
+                      <button
+                        @click="previsualizarArchivo(archivo)"
+                        class="action-button small"
+                      >
                         <i class="fas fa-eye"></i>
                       </button>
-                      <button @click="eliminarArchivo(archivo.id)" class="action-button small danger">
+                      <button
+                        @click="eliminarArchivo(archivo.id)"
+                        class="action-button small danger"
+                      >
                         <i class="fas fa-trash"></i>
                       </button>
                     </div>
@@ -188,113 +254,153 @@
             </div>
             <div class="detalle-section">
               <h3>Exportación de archivos</h3>
-                <div class="botones-container">
-                  <button @click="exportarPlan(fichaSeleccionada.id)" class="action-button primary">Exportar plan alimenticio</button>
-                  <button @click="exportarFicha(fichaSeleccionada.id)" class="action-button primary" style="margin-left: 10px;">Exportar ficha</button>
-                </div>
+              <div class="botones-container">
+                <button
+                  @click="exportarPlan(fichaSeleccionada.id)"
+                  class="action-button primary"
+                >
+                  Exportar plan alimenticio
+                </button>
+                <button
+                  @click="exportarFicha(fichaSeleccionada.id)"
+                  class="action-button primary"
+                  style="margin-left: 10px"
+                >
+                  Exportar ficha
+                </button>
+              </div>
             </div>
           </div>
 
-          
-          
           <div class="modal-footer">
-            <button @click="nuevaConsulta(fichaSeleccionada.id)" class="action-button primary">Nueva consulta</button>
-            <button @click="editarFicha(fichaSeleccionada.id)" class="action-button secondary">Editar ficha</button>
-            <button @click="eliminarFicha(fichaSeleccionada.id)" class="action-button danger">Eliminar ficha</button>
-            <button @click="mostrarControlPeriodico = true" class="action-button control">Agregar control periódico</button>
-            <button @click="mostrarHistorial = true" class="action-button history">Ver Historial Clínico</button>
-            <button @click="compartirFicha(fichaSeleccionada)" class="action-button secondary">Compartir por correo</button>
-            <button @click="closeModal" class="action-button cancel">Cerrar</button>
+            <button
+              @click="nuevaConsulta(fichaSeleccionada.id)"
+              class="action-button primary"
+            >
+              Nueva consulta
+            </button>
+            <button
+              @click="editarFicha(fichaSeleccionada.id)"
+              class="action-button secondary"
+            >
+              Editar ficha
+            </button>
+            <button
+              @click="eliminarFicha(fichaSeleccionada.id)"
+              class="action-button danger"
+            >
+              Eliminar ficha
+            </button>
+            <button
+              @click="mostrarAntropometria = true"
+              class="action-button control"
+            >
+              Agregar antropometria
+            </button>
+            <button
+              @click="mostrarHistorial = true"
+              class="action-button history"
+            >
+              Ver Historial Clínico
+            </button>
+            <button
+              @click="compartirFicha(fichaSeleccionada)"
+              class="action-button secondary"
+            >
+              Compartir por correo
+            </button>
+            <button @click="closeModal" class="action-button cancel">
+              Cerrar
+            </button>
           </div>
         </div>
       </div>
 
-      <ControlPeriodico 
-        v-if="mostrarControlPeriodico"
-        :ficha-id="fichaSeleccionada.id" 
+      <ControlPeriodico
+        v-if="mostrarAntropometria"
+        :ficha-id="fichaSeleccionada.id"
         @control-guardado="actualizarControles"
-        @cerrar="mostrarControlPeriodico = false"
+        @cerrar="mostrarAntropometria = false"
       />
-      <HistorialClinico 
+      <HistorialClinico
         v-if="mostrarHistorial"
         :paciente-id="fichaSeleccionada.id"
         @cerrar="mostrarHistorial = false"
       />
-      <NotasSeguimiento 
-  v-if="mostrarNotas"
-  :paciente-id="fichaSeleccionada.id"
-  @cerrar="mostrarNotas = false"
-/>
-
+      <NotasSeguimiento
+        v-if="mostrarNotas"
+        :paciente-id="fichaSeleccionada.id"
+        @cerrar="mostrarNotas = false"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import ControlPeriodico from './ControlPeriodico.vue';
-import HistorialClinico from '@/components/HistorialClinico.vue';
-import NotasSeguimiento from '@/components/NotasSeguimiento.vue';
-import GraficaEvolucion from '@/components/GraficaEvolucion.vue';
-
-
+import ControlPeriodico from "./ControlPeriodico.vue";
+import HistorialClinico from "@/components/HistorialClinico.vue";
+import NotasSeguimiento from "@/components/NotasSeguimiento.vue";
+import GraficaEvolucion from "@/components/GraficaEvolucion.vue";
 
 export default {
-  name: 'BusquedaFichas',
+  name: "BusquedaFichas",
   components: {
-      ControlPeriodico,
-  HistorialClinico,
-  NotasSeguimiento,
-  GraficaEvolucion,
+    ControlPeriodico,
+    HistorialClinico,
+    NotasSeguimiento,
+    GraficaEvolucion,
   },
   data() {
     return {
-      searchTerm: '',
+      searchTerm: "",
       loading: false,
       fichas: [],
-      sortBy: 'fecha',
-      filtroEstado: 'todos',
+      sortBy: "fecha",
+      filtroEstado: "todos",
       paginaActual: 1,
       itemsPorPagina: 6,
       showModal: false,
       fichaSeleccionada: {},
-      mostrarControlPeriodico: false,
+      mostrarAntropometria: false,
       mostrarHistorial: false,
       archivos: [],
-      archivosCargando: false
-    }
+      archivosCargando: false,
+    };
   },
   computed: {
     fichasFiltradas() {
-      let resultado = [...this.fichas]
-      
+      let resultado = [...this.fichas];
+
       // Filtro por estado
-      if (this.filtroEstado !== 'todos') {
-        resultado = resultado.filter(ficha => ficha.estado === this.filtroEstado)
+      if (this.filtroEstado !== "todos") {
+        resultado = resultado.filter(
+          (ficha) => ficha.estado === this.filtroEstado
+        );
       }
-      
-      return resultado
+
+      return resultado;
     },
     fichasOrdenadas() {
-      let resultado = [...this.fichasFiltradas]
-      
+      let resultado = [...this.fichasFiltradas];
+
       // Ordenamiento
-      if (this.sortBy === 'fecha') {
-        resultado.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-      } else if (this.sortBy === 'nombre') {
-        resultado.sort((a, b) => a.nombre.localeCompare(b.nombre))
-      } else if (this.sortBy === 'rut') {
-        resultado.sort((a, b) => a.rut.localeCompare(b.rut))
+      if (this.sortBy === "fecha") {
+        resultado.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+      } else if (this.sortBy === "nombre") {
+        resultado.sort((a, b) => a.nombre.localeCompare(b.nombre));
+      } else if (this.sortBy === "rut") {
+        resultado.sort((a, b) => a.rut.localeCompare(b.rut));
       }
-      
+
       // Paginación
-      const inicio = (this.paginaActual - 1) * this.itemsPorPagina
-      const fin = inicio + this.itemsPorPagina
-      
-      return resultado.slice(inicio, fin)
+      const inicio = (this.paginaActual - 1) * this.itemsPorPagina;
+      const fin = inicio + this.itemsPorPagina;
+
+      return resultado.slice(inicio, fin);
     },
     totalPaginas() {
-      return Math.ceil(this.fichasFiltradas.length / this.itemsPorPagina)
-    }
+      return Math.ceil(this.fichasFiltradas.length / this.itemsPorPagina);
+    },
   },
   mounted() {
     this.cargarDatosEjemplo();
@@ -304,268 +410,278 @@ export default {
       this.archivos = [
         {
           id: 1,
-          nombre: 'Analisis_sangre.pdf',
-          tipo: 'application/pdf',
+          nombre: "Analisis_sangre.pdf",
+          tipo: "application/pdf",
           tamano: 245760,
-          fecha: '2023-05-15',
-          url: '#'
+          fecha: "2023-05-15",
+          url: "#",
         },
         {
           id: 2,
-          nombre: 'Receta_medica.docx',
-          tipo: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          nombre: "Receta_medica.docx",
+          tipo: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           tamano: 512000,
-          fecha: '2023-06-20',
-          url: '#'
+          fecha: "2023-06-20",
+          url: "#",
         },
         {
           id: 3,
-          nombre: 'Foto_progreso.jpg',
-          tipo: 'image/jpeg',
+          nombre: "Foto_progreso.jpg",
+          tipo: "image/jpeg",
           tamano: 1024000,
-          fecha: '2023-07-10',
-          url: '#'
-        }
+          fecha: "2023-07-10",
+          url: "#",
+        },
       ];
       this.archivosCargando = false;
     }, 1000);
   },
   methods: {
     buscarFichas() {
-      this.loading = true
-      
+      this.loading = true;
+
       // Simulamos una búsqueda en base de datos
       setTimeout(() => {
         if (this.searchTerm) {
-          this.fichas = this.fichas.filter(ficha => 
-            ficha.rut.includes(this.searchTerm) || 
-            ficha.nombre.toLowerCase().includes(this.searchTerm.toLowerCase())
-          )
+          this.fichas = this.fichas.filter(
+            (ficha) =>
+              ficha.rut.includes(this.searchTerm) ||
+              ficha.nombre.toLowerCase().includes(this.searchTerm.toLowerCase())
+          );
         } else {
           // Si no hay término de búsqueda, recargamos todos los datos
-          this.cargarDatosEjemplo()
+          this.cargarDatosEjemplo();
         }
-        
-        this.paginaActual = 1
-        this.loading = false
-      }, 500)
+
+        this.paginaActual = 1;
+        this.loading = false;
+      }, 500);
     },
     cargarDatosEjemplo() {
       // Datos de ejemplo para mostrar la funcionalidad
       this.fichas = [
         {
           id: 1,
-          nombre: 'Juan Pérez González',
-          rut: '12.345.678-9',
+          nombre: "Juan Pérez González",
+          rut: "12.345.678-9",
           edad: 35,
-          sexo: 'Masculino',
-          telefono: '+56 9 1234 5678',
-          email: 'juan.perez@ejemplo.com',
-          fecha: '2023-04-15',
-          imc: '24.5',
-          estado: 'activo',
+          sexo: "Masculino",
+          telefono: "+56 9 1234 5678",
+          email: "juan.perez@ejemplo.com",
+          fecha: "2023-04-15",
+          imc: "24.5",
+          estado: "activo",
           historial: [
             {
-              fecha: '2023-04-15',
+              fecha: "2023-04-15",
               peso: 78.5,
               altura: 179,
               imc: 24.5,
-              observaciones: 'Paciente con buena adherencia al plan. Se observa disminución de peso respecto a la consulta anterior.',
-              plan: 'Seguir con plan de alimentación balanceado. Incrementar la actividad física a 4 días por semana.'
+              observaciones:
+                "Paciente con buena adherencia al plan. Se observa disminución de peso respecto a la consulta anterior.",
+              plan: "Seguir con plan de alimentación balanceado. Incrementar la actividad física a 4 días por semana.",
             },
             {
-              fecha: '2023-02-10',
+              fecha: "2023-02-10",
               peso: 80.2,
               altura: 179,
               imc: 25.0,
-              observaciones: 'Paciente refiere ansiedad por alimentos dulces en las tardes.',
-              plan: 'Ajuste de plan alimentario incluyendo colaciones saludables para controlar ansiedad.'
-            }
-          ]
+              observaciones:
+                "Paciente refiere ansiedad por alimentos dulces en las tardes.",
+              plan: "Ajuste de plan alimentario incluyendo colaciones saludables para controlar ansiedad.",
+            },
+          ],
         },
         {
           id: 2,
-          nombre: 'María Fernández López',
-          rut: '18.765.432-1',
+          nombre: "María Fernández López",
+          rut: "18.765.432-1",
           edad: 28,
-          sexo: 'Femenino',
-          telefono: '+56 9 8765 4321',
-          email: 'maria.fernandez@ejemplo.com',
-          fecha: '2023-05-20',
-          imc: '22.1',
-          estado: 'activo',
+          sexo: "Femenino",
+          telefono: "+56 9 8765 4321",
+          email: "maria.fernandez@ejemplo.com",
+          fecha: "2023-05-20",
+          imc: "22.1",
+          estado: "activo",
           historial: [
             {
-              fecha: '2023-05-20',
+              fecha: "2023-05-20",
               peso: 58.3,
               altura: 162,
               imc: 22.1,
-              observaciones: 'Paciente busca mejorar hábitos alimentarios. Sin patologías de base.',
-              plan: 'Plan alimentario de 1800 kcal con distribución adecuada de macronutrientes.'
-            }
-          ]
+              observaciones:
+                "Paciente busca mejorar hábitos alimentarios. Sin patologías de base.",
+              plan: "Plan alimentario de 1800 kcal con distribución adecuada de macronutrientes.",
+            },
+          ],
         },
         {
           id: 3,
-          nombre: 'Roberto Soto Mendoza',
-          rut: '9.876.543-2',
+          nombre: "Roberto Soto Mendoza",
+          rut: "9.876.543-2",
           edad: 45,
-          sexo: 'Masculino',
-          telefono: '+56 9 5432 1098',
-          email: 'roberto.soto@ejemplo.com',
-          fecha: '2023-03-05',
-          imc: '27.8',
-          estado: 'inactivo',
+          sexo: "Masculino",
+          telefono: "+56 9 5432 1098",
+          email: "roberto.soto@ejemplo.com",
+          fecha: "2023-03-05",
+          imc: "27.8",
+          estado: "inactivo",
           historial: [
             {
-              fecha: '2023-03-05',
+              fecha: "2023-03-05",
               peso: 85.4,
               altura: 175,
               imc: 27.8,
-              observaciones: 'Paciente con sobrepeso y presión arterial elevada. Requiere reducción de sodio en la dieta.',
-              plan: 'Plan DASH modificado con restricción de sodio y control de carbohidratos refinados.'
+              observaciones:
+                "Paciente con sobrepeso y presión arterial elevada. Requiere reducción de sodio en la dieta.",
+              plan: "Plan DASH modificado con restricción de sodio y control de carbohidratos refinados.",
             },
             {
-              fecha: '2023-01-15',
+              fecha: "2023-01-15",
               peso: 87.2,
               altura: 175,
               imc: 28.4,
-              observaciones: 'Evaluación inicial. Paciente con antecedentes familiares de hipertensión.',
-              plan: 'Plan alimentario hipocalórico con reducción moderada de sodio.'
-            }
-          ]
+              observaciones:
+                "Evaluación inicial. Paciente con antecedentes familiares de hipertensión.",
+              plan: "Plan alimentario hipocalórico con reducción moderada de sodio.",
+            },
+          ],
         },
         {
           id: 4,
-          nombre: 'Laura Gutiérrez Vega',
-          rut: '14.852.963-7',
+          nombre: "Laura Gutiérrez Vega",
+          rut: "14.852.963-7",
           edad: 31,
-          sexo: 'Femenino',
-          telefono: '+56 9 7485 2369',
-          email: 'laura.gutierrez@ejemplo.com',
-          fecha: '2023-06-10',
-          imc: '20.8',
-          estado: 'activo',
+          sexo: "Femenino",
+          telefono: "+56 9 7485 2369",
+          email: "laura.gutierrez@ejemplo.com",
+          fecha: "2023-06-10",
+          imc: "20.8",
+          estado: "activo",
           historial: [
             {
-              fecha: '2023-06-10',
+              fecha: "2023-06-10",
               peso: 54.1,
               altura: 161,
               imc: 20.8,
-              observaciones: 'Paciente vegetariana que busca mejorar su composición corporal y aumentar masa muscular.',
-              plan: 'Plan vegetariano con adecuada ingesta proteica y suplementación de B12.'
-            }
-          ]
+              observaciones:
+                "Paciente vegetariana que busca mejorar su composición corporal y aumentar masa muscular.",
+              plan: "Plan vegetariano con adecuada ingesta proteica y suplementación de B12.",
+            },
+          ],
         },
         {
           id: 5,
-          nombre: 'Carlos Muñoz Rojas',
-          rut: '16.357.159-5',
+          nombre: "Carlos Muñoz Rojas",
+          rut: "16.357.159-5",
           edad: 42,
-          sexo: 'Masculino',
-          telefono: '+56 9 3571 5980',
-          email: 'carlos.munoz@ejemplo.com',
-          fecha: '2023-02-25',
-          imc: '30.2',
-          estado: 'activo',
+          sexo: "Masculino",
+          telefono: "+56 9 3571 5980",
+          email: "carlos.munoz@ejemplo.com",
+          fecha: "2023-02-25",
+          imc: "30.2",
+          estado: "activo",
           historial: [
             {
-              fecha: '2023-02-25',
+              fecha: "2023-02-25",
               peso: 96.5,
               altura: 179,
               imc: 30.2,
-              tipo: 'Primera evaluación',
-              observaciones: 'Paciente con obesidad grado I y resistencia a la insulina.',
-              plan: 'Plan de alimentación con control de índice glicémico y porciones.'
-            }
-          ]
+              tipo: "Primera evaluación",
+              observaciones:
+                "Paciente con obesidad grado I y resistencia a la insulina.",
+              plan: "Plan de alimentación con control de índice glicémico y porciones.",
+            },
+          ],
         },
         {
           id: 6,
-          nombre: 'Ana López Silva',
-          rut: '19.753.159-8',
+          nombre: "Ana López Silva",
+          rut: "19.753.159-8",
           edad: 25,
-          sexo: 'Femenino',
-          telefono: '+56 9 1598 7532',
-          email: 'ana.lopez@ejemplo.com',
-          fecha: '2023-05-05',
-          imc: '19.5',
-          estado: 'activo',
+          sexo: "Femenino",
+          telefono: "+56 9 1598 7532",
+          email: "ana.lopez@ejemplo.com",
+          fecha: "2023-05-05",
+          imc: "19.5",
+          estado: "activo",
           historial: [
             {
-              fecha: '2023-05-05',
+              fecha: "2023-05-05",
               peso: 50.2,
               altura: 160,
               imc: 19.5,
-              observaciones: 'Paciente busca mejorar alimentación para rendimiento deportivo (runner).',
-              plan: 'Plan de alimentación adaptado a sus necesidades deportivas con distribución adecuada de macros.'
-            }
-          ]
+              observaciones:
+                "Paciente busca mejorar alimentación para rendimiento deportivo (runner).",
+              plan: "Plan de alimentación adaptado a sus necesidades deportivas con distribución adecuada de macros.",
+            },
+          ],
         },
         {
           id: 7,
-          nombre: 'Daniel Castro Bravo',
-          rut: '15.987.654-3',
+          nombre: "Daniel Castro Bravo",
+          rut: "15.987.654-3",
           edad: 38,
-          sexo: 'Masculino',
-          telefono: '+56 9 8765 4321',
-          email: 'daniel.castro@ejemplo.com',
-          fecha: '2023-01-30',
-          imc: '26.4',
-          estado: 'inactivo',
+          sexo: "Masculino",
+          telefono: "+56 9 8765 4321",
+          email: "daniel.castro@ejemplo.com",
+          fecha: "2023-01-30",
+          imc: "26.4",
+          estado: "inactivo",
           historial: [
             {
-              fecha: '2023-01-30',
+              fecha: "2023-01-30",
               peso: 82.5,
               altura: 177,
               imc: 26.4,
-              observaciones: 'Paciente con antecedentes de colesterol elevado. Busca mejorar su perfil lipídico.',
-              plan: 'Plan alimentario con control de grasas saturadas y aumento de ácidos grasos omega 3.'
-            }
-          ]
-        }
-      ]
+              observaciones:
+                "Paciente con antecedentes de colesterol elevado. Busca mejorar su perfil lipídico.",
+              plan: "Plan alimentario con control de grasas saturadas y aumento de ácidos grasos omega 3.",
+            },
+          ],
+        },
+      ];
     },
     formatDate(dateString) {
-      const options = { day: '2-digit', month: '2-digit', year: 'numeric' }
-      return new Date(dateString).toLocaleDateString('es-CL', options)
+      const options = { day: "2-digit", month: "2-digit", year: "numeric" };
+      return new Date(dateString).toLocaleDateString("es-CL", options);
     },
     cambiarPagina(pagina) {
       if (pagina >= 1 && pagina <= this.totalPaginas) {
-        this.paginaActual = pagina
+        this.paginaActual = pagina;
       }
     },
     verDetalle(id) {
-      const ficha = this.fichas.find(f => f.id === id)
+      const ficha = this.fichas.find((f) => f.id === id);
       if (ficha) {
-        this.fichaSeleccionada = { ...ficha }
-        this.showModal = true
+        this.fichaSeleccionada = { ...ficha };
+        this.showModal = true;
       }
     },
     closeModal() {
-      this.showModal = false
+      this.showModal = false;
     },
     nuevaConsulta(id) {
-      alert(`Redirigiendo a nueva consulta para paciente ID: ${id}`)
+      alert(`Redirigiendo a nueva consulta para paciente ID: ${id}`);
     },
     editarFicha(id) {
-  this.$router.push({ name: 'EditarFicha', params: { id } })
+      this.$router.push({ name: "EditarFicha", params: { id } });
     },
     eliminarFicha(id) {
-      alert(`borrando ficha del paciente ID: ${id}`)
+      alert(`borrando ficha del paciente ID: ${id}`);
     },
     exportarPlan(id) {
-      alert(`Exportando plan alimenticio de ficha con ID: ${id}`)
+      alert(`Exportando plan alimenticio de ficha con ID: ${id}`);
     },
     exportarFicha(id) {
-      alert(`Exportando ficha con ID: ${id}`)
+      alert(`Exportando ficha con ID: ${id}`);
     },
     actualizarControles(nuevoControl) {
       if (!this.fichaSeleccionada.historial) {
         this.fichaSeleccionada.historial = [];
       }
       this.fichaSeleccionada.historial.push(nuevoControl);
-      this.mostrarControlPeriodico = false;
+      this.mostrarAntropometria = false;
     },
     // Métodos para manejo de archivos
     triggerFileInput() {
@@ -582,40 +698,44 @@ export default {
       try {
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
-          
+
           if (file.size > 10 * 1024 * 1024) {
             alert(`El archivo ${file.name} excede el tamaño máximo de 10MB`);
             continue;
           }
-          
-          const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 
-                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+          const validTypes = [
+            "application/pdf",
+            "image/jpeg",
+            "image/png",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          ];
           if (!validTypes.includes(file.type)) {
             alert(`El formato de ${file.name} no está permitido`);
             continue;
           }
-          
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
+
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
           this.archivos.push({
             id: Date.now() + i,
             nombre: file.name,
             tipo: file.type,
             tamano: file.size,
             fecha: new Date().toISOString(),
-            url: URL.createObjectURL(file)
+            url: URL.createObjectURL(file),
           });
         }
       } catch (error) {
-        console.error('Error al subir archivos:', error);
-        alert('Error al subir archivos');
+        console.error("Error al subir archivos:", error);
+        alert("Error al subir archivos");
       } finally {
         this.archivosCargando = false;
-        this.$refs.fileInput.value = '';
+        this.$refs.fileInput.value = "";
       }
     },
     descargarArchivo(archivo) {
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = archivo.url;
       link.download = archivo.nombre;
       document.body.appendChild(link);
@@ -623,48 +743,51 @@ export default {
       document.body.removeChild(link);
     },
     previsualizarArchivo(archivo) {
-      if (archivo.tipo.includes('image')) {
-        window.open(archivo.url, '_blank');
-      } else if (archivo.tipo === 'application/pdf') {
-        window.open(archivo.url, '_blank');
+      if (archivo.tipo.includes("image")) {
+        window.open(archivo.url, "_blank");
+      } else if (archivo.tipo === "application/pdf") {
+        window.open(archivo.url, "_blank");
       } else {
-        alert('Vista previa no disponible para este tipo de archivo');
+        alert("Vista previa no disponible para este tipo de archivo");
       }
     },
     async eliminarArchivo(id) {
-      if (confirm('¿Está seguro que desea eliminar este archivo?')) {
+      if (confirm("¿Está seguro que desea eliminar este archivo?")) {
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
-          this.archivos = this.archivos.filter(a => a.id !== id);
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          this.archivos = this.archivos.filter((a) => a.id !== id);
         } catch (error) {
-          console.error('Error al eliminar archivo:', error);
-          alert('Error al eliminar archivo');
+          console.error("Error al eliminar archivo:", error);
+          alert("Error al eliminar archivo");
         }
       }
     },
     getFileIcon(tipo) {
-      if (tipo.includes('image')) return 'fas fa-file-image';
-      if (tipo === 'application/pdf') return 'fas fa-file-pdf';
-      if (tipo.includes('word')) return 'fas fa-file-word';
-      return 'fas fa-file';
+      if (tipo.includes("image")) return "fas fa-file-image";
+      if (tipo === "application/pdf") return "fas fa-file-pdf";
+      if (tipo.includes("word")) return "fas fa-file-word";
+      return "fas fa-file";
     },
     formatFileSize(bytes) {
-      if (bytes === 0) return '0 Bytes';
+      if (bytes === 0) return "0 Bytes";
       const k = 1024;
-      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const sizes = ["Bytes", "KB", "MB", "GB"];
       const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
     },
     compartirFicha(ficha) {
-  const emailDestino = prompt(`Ingrese el correo al que desea enviar la ficha de ${ficha.nombre}:`);
-  if (!emailDestino) return;
+      const emailDestino = prompt(
+        `Ingrese el correo al que desea enviar la ficha de ${ficha.nombre}:`
+      );
+      if (!emailDestino) return;
 
-  // Simulación de envío por correo
-  alert(`Se ha enviado la ficha del paciente "${ficha.nombre}" al correo: ${emailDestino}`);
-}
-
-  }
-}
+      // Simulación de envío por correo
+      alert(
+        `Se ha enviado la ficha del paciente "${ficha.nombre}" al correo: ${emailDestino}`
+      );
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -943,7 +1066,8 @@ export default {
   color: #4a5568;
 }
 
-.loading, .no-results {
+.loading,
+.no-results {
   text-align: center;
   padding: 2rem;
   color: #4a5568;
@@ -1114,7 +1238,8 @@ export default {
   color: #718096;
 }
 
-.loading-files, .no-files {
+.loading-files,
+.no-files {
   text-align: center;
   padding: 1rem;
   color: #718096;
@@ -1158,7 +1283,8 @@ export default {
   color: #2c3e50;
 }
 
-.archivo-fecha, .archivo-tamano {
+.archivo-fecha,
+.archivo-tamano {
   font-size: 0.85rem;
   color: #718096;
   white-space: nowrap;
@@ -1187,41 +1313,41 @@ export default {
   .busqueda-container {
     padding: 1rem;
   }
-  
+
   .search-box {
     flex-direction: column;
   }
-  
+
   .filters-section {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .filter-group {
     width: 100%;
   }
-  
+
   .filter-select {
     width: 100%;
   }
-  
+
   .fichas-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .detalle-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .modal-content {
     width: 95%;
     max-height: 95vh;
   }
-  
+
   .modal-footer {
     flex-wrap: wrap;
   }
-  
+
   .action-button {
     flex: 1;
     text-align: center;
@@ -1232,17 +1358,18 @@ export default {
     align-items: flex-start;
     gap: 0.25rem;
   }
-  
-  .archivo-fecha, .archivo-tamano {
+
+  .archivo-fecha,
+  .archivo-tamano {
     margin-left: 0;
   }
-  
+
   .archivo-item {
     flex-direction: column;
     align-items: stretch;
     gap: 0.75rem;
   }
-  
+
   .archivo-acciones {
     justify-content: flex-end;
   }
