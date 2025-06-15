@@ -283,6 +283,48 @@
             <p>No existen registros antropométricos.</p>
           </div>
 
+          <!-- Registro 24 Horas -->
+          <div
+            class="detalle-section"
+            v-if="fichaSeleccionada.registros24h?.length"
+          >
+            <h3 class="text-dark">Historial Registro 24 Horas</h3>
+
+            <div
+              v-for="(registro, index) in fichaSeleccionada.registros24h"
+              :key="index"
+              class="consulta-item"
+            >
+              <p class="text-dark">
+                <strong>Fecha de Registro:</strong> {{ registro.fechaCreacion }}
+              </p>
+
+              <div
+                v-for="(comida, idx) in registro.rRegistro24hTipocomidas"
+                :key="idx"
+                class="detalle-comida"
+              >
+                <p class="text-dark">
+                  <strong>Tipo de comida:</strong>
+                  {{ comida.fkTipoComida?.tipoComida }}
+                </p>
+                <p class="text-dark">
+                  <strong>Descripción:</strong> {{ comida.descripcion }}
+                </p>
+                <p class="text-dark">
+                  <strong>Hora:</strong> {{ comida.hora }}
+                </p>
+              </div>
+
+              <hr />
+            </div>
+          </div>
+
+          <div v-else class="detalle-section">
+            <h3>Historial Registro 24 Horas</h3>
+            <p>No existen registros de 24 horas.</p>
+          </div>
+
           <!-- Archivos adjuntos -->
           <div class="detalle-section">
             <h3>Archivos Adjuntos</h3>
