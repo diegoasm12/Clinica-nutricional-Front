@@ -279,7 +279,7 @@
   <h3 class="section-title">Encuesta de Tendencia de Consumo</h3>
 
   <div
-    v-for="(item, index) in form.encuesta_alimentos"
+    v-for="(item, index) in form.rEncuestaTendenciaConsumoAlimentos"
     :key="index"
     class="form-grid align-center"
     style="align-items: center"
@@ -417,7 +417,7 @@ export default {
   methods: {
     async cargarAlimentos() {
       try {
-        const res = await axios.get(`${process.env.VUE_APP_API_URL}/alimento`);
+        const res = await axios.get(`${process.env.VUE_APP_API_URL}/alimento`)
         this.alimentosDisponibles = res.data;
       } catch (err) {
         console.error("❌ Error cargando alimentos:", err);
@@ -553,12 +553,6 @@ export default {
   }
 };
 </script>
-
-
-
-
-
-
 <style scoped>
 .consulta-container {
   width: 100%;
