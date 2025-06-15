@@ -47,11 +47,7 @@
           name="Planes Nutricionales"
           icon="tim-icons icon-pin"
         />
-        <sidebar-link
-          to="/admin/ConsultarestadoFicha"
-          name="Estado Ficha Nutricional"
-          icon="tim-icons icon-pin"
-        />
+
       </template>
     </side-bar>
     <div class="main-panel">

@@ -41,6 +41,9 @@
 </template>
 
 <script>
+import axios from "axios"
+import dayjs from "dayjs"
+
 export default {
   name: 'EstadoFichas',
   data() {
@@ -55,41 +58,41 @@ export default {
     this.cargarFichas()
   },
   methods: {
-    cargarFichas() {
+    async cargarFichas() {
       this.cargando = true
-      setTimeout(() => {
-        this.fichas = [
-          {
-            id: 1,
-            nombre: 'Ana López',
-            rut: '19.753.159-8',
-            edad: 25,
-            estado: 'activo'
-          },
-          {
-            id: 2,
-            nombre: 'Carlos Muñoz',
-            rut: '16.357.159-5',
-            edad: 42,
-            estado: 'inactivo'
-          },
-          {
-            id: 3,
-            nombre: 'Laura Gutiérrez',
-            rut: '14.852.963-7',
-            edad: 31,
-            estado: 'activo'
+      try {
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/ficha`)
+        const fichasAPI = response.data
+
+        this.fichas = fichasAPI.map(ficha => {
+          const usuario = ficha.fkUsuario || {}
+          const nacimiento = usuario.fechaNacimiento
+          const edad = nacimiento ? dayjs().diff(dayjs(nacimiento), 'year') : 'N/A'
+          const estado = ficha.fechaEliminacion ? 'inactivo' : 'activo'
+
+          return {
+            id: ficha.id,
+            nombre: usuario.nombre || 'Sin nombre',
+            rut: usuario.rut || 'Sin RUT',
+            edad,
+            estado
           }
-        ]
+        })
+
         this.fichasFiltradas = [...this.fichas]
+      } catch (error) {
+        console.error("Error al cargar fichas:", error)
+        this.fichas = []
+        this.fichasFiltradas = []
+      } finally {
         this.cargando = false
-      }, 800)
+      }
     },
     filtrarFichas() {
       const termino = this.busqueda.toLowerCase()
       this.fichasFiltradas = this.fichas.filter(f =>
         f.nombre.toLowerCase().includes(termino) ||
-        f.rut.includes(this.busqueda)
+        f.rut.toString().includes(this.busqueda)
       )
     }
   }

@@ -5,61 +5,180 @@
         {{ mensajeNotificacion }}
       </div>
 
-      <h1 class="form-title">Gestión de Roles</h1>
+      <h1 class="form-title">Gestión de Usuarios y Roles</h1>
 
+      <!-- Buscador -->
       <div class="form-section">
-        <h2 class="section-title">Buscar rol</h2>
+        <h2 class="section-title">Buscar usuario</h2>
         <div class="form-group">
-          <label class="form-label">Ingrese nombre del rol</label>
+          <label class="form-label">Ingrese nombre o RUT</label>
           <input 
             v-model="busqueda" 
-            placeholder="Ej: Admin" 
+            placeholder="Ej: Ana o 19.753.159-8" 
             class="form-input"
-            @input="filtrarRoles"
+            @input="filtrarUsuarios"
           >
         </div>
       </div>
 
+      <!-- Cargando -->
       <div v-if="cargando" class="loading-state">
-        <p>Cargando roles...</p>
+        <p>Cargando usuarios...</p>
       </div>
 
-      <div v-else-if="rolesFiltrados.length === 0" class="empty-state">
-        <p>No se encontraron roles</p>
+      <!-- Sin resultados -->
+      <div v-else-if="usuariosFiltrados.length === 0" class="empty-state">
+        <p>No se encontraron usuarios</p>
       </div>
 
+      <!-- Lista de usuarios -->
       <div v-else class="roles-list">
-        <div v-for="rol in rolesFiltrados" :key="rol.id" class="role-card">
+        <div v-for="usuario in usuariosFiltrados" :key="usuario.id" class="role-card">
           <div class="role-info">
-            <h3>{{ rol.nombre }}</h3>
-            <p class="descripcion">{{ rol.descripcion }}</p>
+            <h3>{{ usuario.nombre }}</h3>
+            <p><strong>RUT:</strong> {{ usuario.rut }}</p>
+            <p><strong>Correo:</strong> {{ usuario.correo }}</p>
+            <p><strong>Rol actual:</strong> {{ usuario.rolActivo || 'Sin rol' }}</p>
+
+            <!-- Select de nuevo rol -->
+            <select
+              v-model="rolesSeleccionados[usuario.id]"
+              class="form-input"
+              style="margin-top: 1rem;"
+            >
+              <option disabled value="">Seleccione nuevo rol</option>
+              <option v-for="rol in rolesDisponibles" :key="rol.id" :value="rol.rol">
+                {{ rol.rol }}
+              </option>
+            </select>
+
+            <!-- Botón para guardar cambio -->
+            <button
+              class="submit-button"
+              style="margin-top: 0.5rem"
+              @click="guardarRolDirecto(usuario)"
+              :disabled="!rolesSeleccionados[usuario.id] || rolesSeleccionados[usuario.id] === usuario.rolActivo"
+            >
+              Guardar
+            </button>
           </div>
-          <button class="submit-button" @click="editarRol(rol)">Editar Rol</button>
         </div>
       </div>
     </div>
   </div>
 </template>
 
+
 <script>
+import axios from "axios"
+
 export default {
   name: 'GestionRoles',
   data() {
     return {
       busqueda: '',
       cargando: false,
-      roles: [],
-      rolesFiltrados: [],
+      usuarios: [],
+      usuariosFiltrados: [],
       mostrarNotificacion: false,
       mensajeNotificacion: '',
       tipoNotificacion: 'info',
-      timeoutNotificacion: null
+      timeoutNotificacion: null,
+
+      rolesDisponibles: [
+        { id: 1, rol: 'Admin' },
+        { id: 2, rol: 'Nutricionista' },
+        { id: 3, rol: 'Asistente' }
+      ],
+
+      rolesSeleccionados: {} // { [usuario.id]: 'NuevoRol' }
     }
   },
   created() {
-    this.cargarRoles()
+    this.cargarUsuarios()
   },
   methods: {
+    async cargarUsuarios() {
+      this.cargando = true
+      try {
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/usuario`)
+        this.usuarios = response.data.map(u => {
+          // Buscar el primer rol activo (sin fechaEliminacion)
+          const rolActivo = (u.rRolUsuario || []).find(r => !r.fechaEliminacion)
+          const rol = rolActivo?.fkRol?.rol || 'Sin rol'
+          const idRelacionRol = rolActivo?.id || null
+
+          return {
+            id: u.id,
+            rut: u.rut,
+            nombre: u.nombre,
+            correo: u.correo,
+            rolActivo: rol,
+            idRelacionRol
+          }
+        })
+
+        this.usuariosFiltrados = [...this.usuarios]
+
+        // Inicializar selects
+        this.usuarios.forEach(u => {
+          this.$set(this.rolesSeleccionados, u.id, '')
+        })
+      } catch (error) {
+        console.error("Error al cargar usuarios:", error)
+        this.mostrarNotificacionTemporal("Error al cargar usuarios", "error")
+      } finally {
+        this.cargando = false
+      }
+    },
+
+    filtrarUsuarios() {
+      const termino = this.busqueda.toLowerCase()
+      this.usuariosFiltrados = this.usuarios.filter(u =>
+        u.nombre.toLowerCase().includes(termino) ||
+        u.rut.toString().includes(this.busqueda)
+      )
+    },
+
+    async guardarRolDirecto(usuario) {
+      try {
+        const nuevoRol = this.rolesSeleccionados[usuario.id]
+
+        if (!nuevoRol || nuevoRol === usuario.rolActivo) {
+          this.mostrarNotificacionTemporal("Seleccione un rol distinto", "info")
+          return
+        }
+
+        // Eliminar rol actual si existe
+        if (usuario.idRelacionRol) {
+          await axios.patch(`${process.env.VUE_APP_API_URL}/r-rol-usuario/${usuario.idRelacionRol}`, {
+            estado: "eliminar"
+          })
+        }
+
+        const rolEncontrado = this.rolesDisponibles.find(r => r.rol === nuevoRol)
+        if (!rolEncontrado) {
+          this.mostrarNotificacionTemporal("Rol seleccionado inválido", "error")
+          return
+        }
+
+        // Asignar nuevo rol
+        await axios.post(`${process.env.VUE_APP_API_URL}/r-rol-usuario`, {
+          fkUsuario_id: usuario.id,
+          fkRol_id: rolEncontrado.id
+        })
+
+        this.mostrarNotificacionTemporal("Rol actualizado correctamente", "exito")
+
+        // Recargar usuarios y limpiar select
+        await this.cargarUsuarios()
+        this.$set(this.rolesSeleccionados, usuario.id, '')
+      } catch (error) {
+        console.error("Error al actualizar rol:", error.response?.data || error)
+        this.mostrarNotificacionTemporal("Error al actualizar rol", "error")
+      }
+    },
+
     mostrarNotificacionTemporal(mensaje, tipo = 'info', duracion = 3000) {
       if (this.timeoutNotificacion) clearTimeout(this.timeoutNotificacion)
       this.mostrarNotificacion = true
@@ -68,31 +187,13 @@ export default {
       this.timeoutNotificacion = setTimeout(() => {
         this.mostrarNotificacion = false
       }, duracion)
-    },
-    cargarRoles() {
-      this.cargando = true
-      setTimeout(() => {
-        this.roles = [
-          { id: 1, nombre: 'Admin', descripcion: 'Acceso total al sistema' },
-          { id: 2, nombre: 'Nutricionista', descripcion: 'Acceso a fichas clínicas y consultas' },
-          { id: 3, nombre: 'Asistente', descripcion: 'Acceso restringido a vistas de apoyo' }
-        ]
-        this.rolesFiltrados = [...this.roles]
-        this.cargando = false
-      }, 800)
-    },
-    filtrarRoles() {
-      const termino = this.busqueda.toLowerCase()
-      this.rolesFiltrados = this.roles.filter(r =>
-        r.nombre.toLowerCase().includes(termino)
-      )
-    },
-    editarRol(rol) {
-      this.$router.push({ name: 'EditarRol', params: { id: rol.id } })
     }
   }
 }
 </script>
+
+
+
 
 <style scoped>
 .gestion-container {
@@ -175,12 +276,6 @@ export default {
   font-weight: 600;
 }
 
-.descripcion {
-  font-size: 0.95rem;
-  color: #cbd5e0;
-  margin-top: 0.25rem;
-}
-
 .submit-button {
   width: 100%;
   padding: 0.75rem;
@@ -198,6 +293,58 @@ export default {
 .submit-button:hover {
   background-color: #9e4fb0;
   transform: translateY(-2px);
+}
+.role-info select {
+  margin-bottom: 0.5rem;
+}
+
+
+.cancel-button {
+  padding: 0.75rem;
+  background-color: #718096;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancel-button:hover {
+  background-color: #4a5568;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: #2d3748;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  color: #fff;
+}
+
+.modal h2 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.modal-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
 }
 
 .notificacion {
@@ -245,4 +392,3 @@ export default {
   }
 }
 </style>
-
