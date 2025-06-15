@@ -81,8 +81,6 @@
 </template>
 
 <script>
-const apiUrl = process.env.VUE_APP_API_URL;
-
 import axios from "axios";
 
 export default {
@@ -119,6 +117,12 @@ export default {
         );
 
         if (response.status === 201) {
+          const token = response.data.jwt;
+
+          // Guardamos el token en localStorage
+          localStorage.setItem("token", token);
+
+          // Redirigimos al usuario
           this.$router.push("/admin/verfichasclinicas");
         }
       } catch (error) {
