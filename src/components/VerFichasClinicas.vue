@@ -196,6 +196,78 @@
               }}
             </p>
           </div>
+          <!-- Antropometría -->
+          <div
+            class="detalle-section"
+            v-if="fichaSeleccionada.antropometrias?.length"
+          >
+            <h3 class="text-dark">Historial Antropométrico</h3>
+            <div
+              v-for="(control, index) in fichaSeleccionada.antropometrias"
+              :key="index"
+              class="consulta-item"
+            >
+              <p class="text-dark">
+                <strong>Peso:</strong> {{ control.peso }} kg
+              </p>
+              <p class="text-dark">
+                <strong>Talla:</strong> {{ control.talla }} cm
+              </p>
+              <p class="text-dark"><strong>IMC:</strong> {{ control.imc }}</p>
+
+              <h4 class="text-dark">Pliegues y Circunferencias</h4>
+
+              <p class="text-dark">
+                <strong>Circunferencia cintura:</strong>
+                {{ control.tomasPliegues?.[0]?.circunferenciaCintura }}
+              </p>
+              <p class="text-dark">
+                <strong>Circunferencia braquial:</strong>
+                {{ control.tomasPliegues?.[0]?.circunferenciaBraquial }}
+              </p>
+              <p class="text-dark">
+                <strong>Circunferencia cadera:</strong>
+                {{ control.tomasPliegues?.[0]?.circunferenciaCadera }}
+              </p>
+              <p class="text-dark">
+                <strong>Circunferencia pantorrilla:</strong>
+                {{ control.tomasPliegues?.[0]?.circunferenciaPantorrilla }}
+              </p>
+              <p class="text-dark">
+                <strong>Pliegue bicipital:</strong>
+                {{ control.tomasPliegues?.[0]?.pliegueBicipital }}
+              </p>
+              <p class="text-dark">
+                <strong>Pliegue tricipital:</strong>
+                {{ control.tomasPliegues?.[0]?.pliegueTricipital }}
+              </p>
+              <p class="text-dark">
+                <strong>Pliegue subescapular:</strong>
+                {{ control.tomasPliegues?.[0]?.pliegueSubescapular }}
+              </p>
+              <p class="text-dark">
+                <strong>Pliegue suprailiaco:</strong>
+                {{ control.tomasPliegues?.[0]?.pliegueSuprailiaco }}
+              </p>
+              <p class="text-dark">
+                <strong>Pliegue abdominal:</strong>
+                {{ control.tomasPliegues?.[0]?.pliegueAbdominal }}
+              </p>
+              <p class="text-dark">
+                <strong>Pliegue muslo:</strong>
+                {{ control.tomasPliegues?.[0]?.pliegueMuslo }}
+              </p>
+              <p class="text-dark">
+                <strong>Pliegue pantorrilla:</strong>
+                {{ control.tomasPliegues?.[0]?.plieguePantorrilla }}
+              </p>
+            </div>
+          </div>
+
+          <div v-else class="detalle-section">
+            <h3>Historial Antropometría</h3>
+            <p>No existen registros antropométricos.</p>
+          </div>
         </div>
 
         <div class="modal-footer">
@@ -262,6 +334,7 @@ export default {
       try {
         const res = await axios.get(`${process.env.VUE_APP_API_URL}/ficha`);
         this.fichas = res.data;
+        console.log(this.fichas);
       } catch (err) {
         console.error("Error al obtener fichas:", err);
       } finally {
