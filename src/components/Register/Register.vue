@@ -182,7 +182,7 @@ export default {
       console.log(payload);
       try {
         const response = await axios.post(
-          `${process.env.VUE_APP_API_URL}/v1/usuario`,
+          `${process.env.VUE_APP_API_URL}/usuario`,
           payload
         );
         console.log(payload);

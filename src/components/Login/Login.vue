@@ -109,7 +109,7 @@ export default {
 
       try {
         const response = await axios.post(
-          `${process.env.VUE_APP_API_URL}/v1/auth`,
+          `${process.env.VUE_APP_API_URL}/auth`,
           {
             rut: parseInt(this.rut),
             password: this.password,
