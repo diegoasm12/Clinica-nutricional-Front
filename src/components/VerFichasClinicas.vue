@@ -2,15 +2,15 @@
   <div class="busqueda-container">
     <h2 class="section-title">Listado de Fichas</h2>
     <!-- Buscador -->
-<div class="search-box">
-  <input
-    type="text"
-    class="search-input"
-    v-model="busqueda"
-    @input="filtrarFichas"
-    placeholder="Buscar por nombre o RUT"
-  />
-</div>
+    <div class="search-box">
+      <input
+        type="text"
+        class="search-input"
+        v-model="busqueda"
+        @input="filtrarFichas"
+        placeholder="Buscar por nombre o RUT"
+      />
+    </div>
 
     <div v-if="loading" class="loading">Cargando fichas...</div>
     <div v-else-if="fichas.length === 0" class="no-results">
@@ -18,11 +18,11 @@
     </div>
 
     <div v-else-if="fichasFiltradas.length === 0" class="no-results">
-  No se encontraron fichas para el criterio de búsqueda.
-</div>
+      No se encontraron fichas para el criterio de búsqueda.
+    </div>
 
-<div v-else class="fichas-grid">
-  <div v-for="ficha in fichasFiltradas" :key="ficha.id" class="ficha-card">
+    <div v-else class="fichas-grid">
+      <div v-for="ficha in fichasFiltradas" :key="ficha.id" class="ficha-card">
         <h3 class="text-dark">
           {{ ficha.fkUsuario?.nombre || "Nombre no disponible" }}
         </h3>
@@ -339,14 +339,17 @@
         </div>
 
         <div class="modal-footer">
-          <button @click="abrirAntropometria" class="action-button control">
-            Agregar Antropometría
-          </button>
           <button @click="editarFicha" class="action-button secondary">
             Editar ficha
           </button>
           <button @click="eliminarFicha" class="action-button danger">
             Eliminar ficha
+          </button>
+          <button @click="abrirAntropometria" class="action-button control">
+            Agregar Antropometría
+          </button>
+          <button @click="abrirRegistro24h" class="action-button control">
+            Agregar Registro 24 Horas
           </button>
           <button @click="closeModal" class="action-button cancel">
             Cerrar
@@ -362,34 +365,46 @@
       @control-guardado="actualizarControles"
       @cerrar="showAntropometria = false"
     />
+    <Registro24Horas
+      v-if="showRegistro24h"
+      :ficha-id="fichaSeleccionada.id"
+      @guardado="actualizarRegistros24h"
+      @cerrar="showRegistro24h = false"
+    />
   </div>
 </template>
 
 <script>
 import axios from "axios";
 import ControlPeriodico from "./ControlPeriodico.vue";
+import Registro24Horas from "./Registro24hHoras.vue";
 
 export default {
   data() {
     return {
       fichas: [],
       fichasFiltradas: [], // NUEVO: lista filtrada
-      busqueda: "",        // NUEVO: input del filtro
+      busqueda: "", // NUEVO: input del filtro
       loading: false,
       showModal: false,
       fichaSeleccionada: null,
       showAntropometria: false,
       nuevoControl: { peso: null, altura: null },
       archivos: [],
+      showRegistro24h: false,
     };
   },
   components: {
     ControlPeriodico,
+    Registro24Horas,
   },
   mounted() {
     this.obtenerFichas();
   },
   methods: {
+    abrirRegistro24h() {
+      this.showRegistro24h = true;
+    },
     async obtenerFichas() {
       this.loading = true;
       try {
@@ -493,7 +508,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .busqueda-container {
