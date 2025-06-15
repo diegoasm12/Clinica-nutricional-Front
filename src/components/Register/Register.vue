@@ -105,30 +105,6 @@
             />
           </div>
 
-          <!-- Contraseña -->
-          <div class="mb-4 w-100">
-            <label class="form-label mb-2 fs-5 fw-medium">Contraseña</label>
-            <input
-              type="password"
-              class="text-dark form-control"
-              v-model="password"
-              required
-            />
-          </div>
-
-          <!-- Confirmación de contraseña -->
-          <div class="mb-4 w-100">
-            <label class="form-label mb-2 fs-5 fw-medium"
-              >Confirmar Contraseña</label
-            >
-            <input
-              type="password"
-              class="text-dark form-control"
-              v-model="confirmPassword"
-              required
-            />
-          </div>
-
           <hr class="my-4 text-gray-300" />
 
           <button
@@ -168,18 +144,14 @@ export default {
       telefono: "",
       sexo: "",
       fechaNacimiento: "",
-      password: "",
-      confirmPassword: "",
     };
   },
   methods: {
     validarRut(rut) {
-      // Acepta números seguidos de opcionalmente una K (mayúscula o minúscula)
       return /^[0-9]+[kK]?$/.test(rut);
     },
 
     validarCorreo(email) {
-      // Valida al menos que contenga un @
       return email.includes("@");
     },
 
@@ -196,28 +168,24 @@ export default {
         return;
       }
 
-      if (this.password !== this.confirmPassword) {
-        alert("Las contraseñas no coinciden.");
-        return;
-      }
-
       const payload = {
         rut: this.rut.toUpperCase(),
-        fechaNacimiento: this.fechaNacimiento,
+        fechaNacimiento: new Date(this.fechaNacimiento),
         nombre: this.nombre,
         telefono: parseInt(this.telefono),
         correo: this.email,
         sexo: this.sexo,
-        rnRolUsuario: {
+        rRolUsuario: {
           fkRol_id: 2, // Paciente
         },
       };
-
+      console.log(payload);
       try {
         const response = await axios.post(
           `${process.env.VUE_APP_API_URL}/v1/usuario`,
           payload
         );
+        console.log(payload);
         if (response.status === 201) {
           alert("Cuenta creada con éxito");
           this.$router.push("/login");
