@@ -199,18 +199,35 @@
         </div>
 
         <div class="modal-footer">
+          <button @click="abrirAntropometria" class="action-button control">
+            Agregar Antropometría
+          </button>
+          <button @click="editarFicha" class="action-button secondary">
+            Editar ficha
+          </button>
+          <button @click="eliminarFicha" class="action-button danger">
+            Eliminar ficha
+          </button>
           <button @click="closeModal" class="action-button cancel">
             Cerrar
           </button>
         </div>
       </div>
     </div>
+
+    <!-- Modal de antropometría -->
+    <ControlPeriodico
+      v-if="showAntropometria"
+      :ficha-id="fichaSeleccionada.id"
+      @control-guardado="actualizarControles"
+      @cerrar="showAntropometria = false"
+    />
   </div>
 </template>
 
 <script>
 import axios from "axios";
-
+import ControlPeriodico from "./ControlPeriodico.vue";
 export default {
   data() {
     return {
@@ -218,12 +235,28 @@ export default {
       loading: false,
       showModal: false,
       fichaSeleccionada: null,
+      showAntropometria: false,
+      nuevoControl: { peso: null, altura: null },
     };
+  },
+  components: {
+    ControlPeriodico,
   },
   mounted() {
     this.obtenerFichas();
   },
   methods: {
+    abrirAntropometria() {
+      this.showAntropometria = true;
+      console.log(this.fichaSeleccionada.id);
+    },
+    actualizarControles(nuevoControl) {
+      if (!this.fichaSeleccionada.antropometrias) {
+        this.fichaSeleccionada.antropometrias = [];
+      }
+      this.fichaSeleccionada.antropometrias.push(nuevoControl);
+      this.showAntropometria = false;
+    },
     async obtenerFichas() {
       this.loading = true;
       try {
@@ -252,6 +285,23 @@ export default {
         edad--;
       }
       return edad;
+    },
+    editarFicha() {
+      alert("Redirigir a editar ficha (aún no implementado)");
+    },
+    eliminarFicha() {
+      alert("Lógica para eliminar ficha (aún no implementado)");
+    },
+    abrirAntropometriaModal() {
+      this.showAntropometria = true;
+    },
+    closeAntropometria() {
+      this.showAntropometria = false;
+    },
+    guardarAntropometria() {
+      console.log("Guardar antropometría:", this.nuevoControl);
+      this.closeAntropometria();
+      alert("Antropometría guardada (simulado)");
     },
   },
 };

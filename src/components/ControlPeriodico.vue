@@ -198,18 +198,46 @@ export default {
     },
     async guardarAntropometria() {
       try {
+        const plieguesConDefault = {
+          circunferenciaCintura:
+            this.tomaPliegue.circunferenciaCintura?.toString() || "0",
+          circunferenciaBraquial:
+            this.tomaPliegue.circunferenciaBraquial?.toString() || "0",
+          circunferenciaCadera:
+            this.tomaPliegue.circunferenciaCadera?.toString() || "0",
+          circunferenciaPantorrilla:
+            this.tomaPliegue.circunferenciaPantorrilla?.toString() || "0",
+          pliegueTicipital:
+            this.tomaPliegue.pliegueTricipital?.toString() || "0",
+          pliegueBicipital:
+            this.tomaPliegue.pliegueBicipital?.toString() || "0",
+          pliegueSubescapular:
+            this.tomaPliegue.pliegueSubescapular?.toString() || "0",
+          pliegueSuprailiaco:
+            this.tomaPliegue.pliegueSuprailiaco?.toString() || "0",
+          pliegueAbdominal:
+            this.tomaPliegue.pliegueAbdominal?.toString() || "0",
+          pliegueMuslo: this.tomaPliegue.pliegueMuslo?.toString() || "0",
+          plieguePantorrilla:
+            this.tomaPliegue.plieguePantorrilla?.toString() || "0",
+        };
+
         const payload = {
           peso: this.peso.toString(),
           imc: this.calcularIMC.toString(),
           talla: this.talla.toString(),
-          fkFicha: this.fichaId,
-          tomaPliegue: this.tomaPliegue,
+          fkFicha_id: this.fichaId,
+          tomaPliegue: plieguesConDefault,
         };
 
-        await axios.post(
-          `${process.env.VUE_APP_API_URL}/v1/antropometria`,
+        console.log("payload de antropometria", payload);
+
+        const resantro = await axios.post(
+          `${process.env.VUE_APP_API_URL}/antropometria`,
           payload
         );
+        console.log("resantro", resantro);
+
         alert("Registro guardado correctamente");
         this.$emit("guardado");
         this.cerrarModal();
