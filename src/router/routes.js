@@ -16,7 +16,6 @@ import VerPlanNutricional from "../components/VerPlanNutricional.vue";
 import ConsultarEstadoFicha from "../components/ConsultarEstadoFicha.vue";
 import EditarPlan from "../components/EditarPlan.vue";
 
-
 // Lazy loading para las demás páginas
 const Dashboard = () => import("@/pages/Dashboard.vue");
 const Profile = () => import("@/pages/Profile.vue");
@@ -28,26 +27,26 @@ const TableList = () => import("@/pages/TableList.vue");
 
 const routes = [
   {
-    path: '/',
-    redirect: '/login'
+    path: "/",
+    redirect: "/login",
   },
   {
-    path: '/login',
-    name: 'login',
+    path: "/login",
+    name: "login",
     component: LoginView,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: false },
   },
   {
-    path: '/forgot-password',
-    name: 'forgotPassword',
+    path: "/forgot-password",
+    name: "forgotPassword",
     component: ForgotPasswordView,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: false },
   },
   {
-    path: '/register',
-    name: 'register',
+    path: "/register",
+    name: "register",
     component: RegisterView,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: true, role: "Administrador" },
   },
   {
     path: "/admin",
@@ -72,8 +71,8 @@ const routes = [
       {
         path: "/editar-plan/:id",
         name: "EditarPlanNutricional",
-        component: EditarPlan
-      },     
+        component: EditarPlan,
+      },
       {
         path: "notifications",
         name: "notifications",
@@ -100,67 +99,67 @@ const routes = [
         component: TableList,
       },
       {
-        path: 'fichaclinica',
-        name: 'fichaclinica',
+        path: "fichaclinica",
+        name: "fichaclinica",
         component: FichaClinica,
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false },
       },
       {
-        path: 'verfichasclinicas',
-        name: 'verfichasclinicas',
+        path: "verfichasclinicas",
+        name: "verfichasclinicas",
         component: VerFichasClinicas,
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false },
       },
       {
-        path: 'evaluacionNutricional',
-        name: 'evaluacionNutricional',
+        path: "evaluacionNutricional",
+        name: "evaluacionNutricional",
         component: EvaluacionNutricional,
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false },
       },
       {
-        path: 'gestionusuarios',
-        name: 'gestionusuarios',
+        path: "gestionusuarios",
+        name: "gestionusuarios",
         component: GestiondeUsuarios,
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false },
       },
       {
-        path: 'gestionroles',
-        name: 'gestionroles',
+        path: "gestionroles",
+        name: "gestionroles",
         component: GestiondeRoles,
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false },
       },
       {
-        path: 'listaPacientes',
-        name: 'listaPacientes',
+        path: "listaPacientes",
+        name: "listaPacientes",
         component: ListaPacientes,
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false },
       },
       {
-        path: 'verplannutrional',
-        name: 'verplannutrional',
+        path: "verplannutrional",
+        name: "verplannutrional",
         component: VerPlanNutricional,
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false },
       },
       {
-        path: 'ConsultarestadoFicha',
-        name: 'ConsultarestadoFicha',
+        path: "ConsultarestadoFicha",
+        name: "ConsultarestadoFicha",
         component: ConsultarEstadoFicha,
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false },
       },
       {
-        path: 'fichaclinica/:id/editar',
-        name: 'EditarFicha',
+        path: "fichaclinica/:id/editar",
+        name: "EditarFicha",
         component: FichaClinica,
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false },
       },
 
       // Redirección para rutas no encontradas dentro del dashboard
-      { path: "*", redirect: "/admin/dashboard" }
+      { path: "*", redirect: "/admin/dashboard" },
     ],
   },
-  // { 
-  //   path: "*", 
-  //   redirect: "/login" 
+  // {
+  //   path: "*",
+  //   redirect: "/login"
   // },
   { path: "*", component: NotFound },
 ];

@@ -38,6 +38,11 @@
             name="Gestión de Roles"
             icon="tim-icons icon-pin"
           />
+          <sidebar-link
+            to="/register"
+            name="Registrar admin/nutri"
+            icon="tim-icons icon-pin"
+          />
         </template>
 
         <!-- Paciente -->
