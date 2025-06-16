@@ -330,32 +330,50 @@
             <h3>Archivos Adjuntos</h3>
 
             <div class="archivos-container">
-              <div v-if="archivos.length === 0" class="no-files">
+              <div v-if="!fichaSeleccionada.examenes?.length" class="no-files">
                 No hay archivos adjuntos.
               </div>
 
               <div v-else class="archivos-list">
                 <div
-                  v-for="(archivo, index) in archivos"
-                  :key="index"
+                  v-for="(examen, index) in fichaSeleccionada.examenes"
+                  :key="examen.id"
                   class="archivo-item"
                 >
                   <div class="archivo-info">
-                    <i :class="getFileIcon(archivo.tipo)"></i>
-                    <span class="archivo-nombre">{{ archivo.nombre }}</span>
-                    <span class="archivo-fecha">{{ archivo.fecha }}</span>
-                    <span class="archivo-tamano">{{ archivo.tamano }}</span>
+                    <i class="fas fa-file-alt"></i>
+                    <span class="archivo-nombre">{{
+                      examen.nombreExamen
+                    }}</span>
+                    <span class="archivo-fecha">{{
+                      examen.fechaEliminacion
+                        ? examen.fechaEliminacion
+                        : "Activo"
+                    }}</span>
                   </div>
+
                   <div class="archivo-acciones">
-                    <button class="action-button small">
+                    <!-- Descargar archivo -->
+                    <button
+                      class="action-button small"
+                      @click="descargarArchivo(examen.nombreArchivo)"
+                    >
                       <i class="fas fa-download"></i>
                     </button>
-                    <button class="action-button small">
+
+                    <!-- Ver archivo en nueva pestaña -->
+                    <button
+                      class="action-button small"
+                      @click="verArchivo(examen.nombreArchivo)"
+                    >
                       <i class="fas fa-eye"></i>
                     </button>
-                    <button class="action-button small danger">
-                      <i class="fas fa-trash"></i>
-                    </button>
+
+                    <!--
+          <button class="action-button small danger">
+            <i class="fas fa-trash"></i>
+          </button>
+          -->
                   </div>
                 </div>
               </div>
@@ -393,6 +411,16 @@
           <button @click="abrirRegistro24h" class="action-button control">
             Agregar Registro 24 Horas
           </button>
+          <button @click="subirExamen" class="action-button control">
+            Subir Examen
+          </button>
+
+          <input
+            ref="inputFile"
+            type="file"
+            style="display: none"
+            @change="manejarArchivoSeleccionado"
+          />
           <button @click="closeModal" class="action-button cancel">
             Cerrar
           </button>
@@ -444,6 +472,59 @@ export default {
     this.obtenerFichas();
   },
   methods: {
+    descargarArchivo(nombreArchivo) {
+      const url = `${process.env.VUE_APP_API_URL}/file-manager/${nombreArchivo}`;
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = nombreArchivo;
+      link.click();
+    },
+
+    verArchivo(nombreArchivo) {
+      const url = `${process.env.VUE_APP_API_URL}/file-manager/${nombreArchivo}`;
+      window.open(url, "_blank");
+    },
+    subirExamen() {
+      this.$refs.inputFile.click();
+    },
+    async manejarArchivoSeleccionado(event) {
+      const archivo = event.target.files[0];
+      if (!archivo) {
+        alert("Debe seleccionar un archivo.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", archivo);
+
+      try {
+        const responseUpload = await axios.post(
+          `${process.env.VUE_APP_API_URL}/file-manager`,
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+
+        const fileName = responseUpload.data.fileName;
+        console.log("Archivo subido:", fileName);
+
+        const payloadExamen = {
+          nombreExamen: archivo.name,
+          nombreArchivo: fileName,
+          fkFicha_id: this.fichaSeleccionada.id,
+        };
+
+        const resexamen = await axios.post(
+          `${process.env.VUE_APP_API_URL}/examen`,
+          payloadExamen
+        );
+        console.log("Archivo subido:", resexamen);
+
+        alert("Examen registrado correctamente");
+      } catch (error) {
+        console.error("Error al subir examen:", error);
+        alert("Ocurrió un error al subir el examen.");
+      }
+    },
     abrirRegistro24h() {
       this.showRegistro24h = true;
     },
