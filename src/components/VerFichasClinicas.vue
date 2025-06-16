@@ -426,13 +426,15 @@
               </button>
             </div>
           </div>
+          <!-- Sección gráfica -->
+          <div
+            v-if="fichaSeleccionada.antropometrias?.length"
+            class="detalle-section"
+          >
+            <h3 class="text-dark">Gráfico de evolución</h3>
+            <GraficaEvolucion :historial="fichaSeleccionada.antropometrias" />
+          </div>
         </div>
-        <!-- Sección gráfica -->
-<div v-if="fichaSeleccionada.antropometrias?.length" class="detalle-section">
-  <h3 class="text-dark">Gráfico de evolución</h3>
-  <GraficaEvolucion :historial="fichaSeleccionada.antropometrias" />
-</div>
-
 
         <div class="modal-footer">
           <button @click="editarFicha" class="action-button secondary">
@@ -495,9 +497,7 @@ import axios from "axios";
 import ControlPeriodico from "./ControlPeriodico.vue";
 import Registro24Horas from "./Registro24hHoras.vue";
 import PlanNutricional from "./PlanNutricional.vue";
-import GraficaEvolucion from './GraficaEvolucion.vue';
-
-
+import GraficaEvolucion from "./GraficaEvolucion.vue";
 
 export default {
   data() {
@@ -520,7 +520,6 @@ export default {
     Registro24Horas,
     PlanNutricional,
     GraficaEvolucion,
-
   },
   mounted() {
     this.obtenerFichas();
@@ -645,16 +644,16 @@ export default {
       }
       return edad;
     },
-editarFicha() {
-  this.closeModal();
-  const rut = this.fichaSeleccionada.fkUsuario?.rut;
-  if (!rut) return alert("No se puede redirigir sin RUT del paciente");
+    editarFicha() {
+      this.closeModal();
+      const rut = this.fichaSeleccionada.fkUsuario?.rut;
+      if (!rut) return alert("No se puede redirigir sin RUT del paciente");
 
-  this.$router.push({
-    name: 'EditarFicha',
-    params: { id: rut }
-  });
-},
+      this.$router.push({
+        name: "EditarFicha",
+        params: { id: rut },
+      });
+    },
     eliminarFicha() {
       alert("Lógica para eliminar ficha (aún no implementado)");
     },
