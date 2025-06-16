@@ -30,6 +30,7 @@
           <p><strong>Objetivo:</strong> {{ plan.objetivo }}</p>
           <p><strong>Calorías diarias:</strong> {{ plan.calorias }} kcal</p>
           <p><strong>Distribución:</strong> {{ plan.distribucion }}</p>
+          <p><strong>Diagnóstico:</strong> {{ plan.diagnostico }}</p>
           <p><strong>Observaciones:</strong> {{ plan.observaciones }}</p>
           <button class="submit-button" @click="editarPlan(plan)">Editar Plan</button>
         </div>
@@ -39,57 +40,68 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  name: 'PlanNutricional',
+  name: "PlanNutricional",
   data() {
     return {
-      busqueda: '',
+      busqueda: "",
       cargando: false,
       planes: [],
-      planesFiltrados: []
-    }
+      planesFiltrados: [],
+    };
   },
   created() {
-    this.cargarPlanes()
+    this.cargarPlanes();
   },
   methods: {
-    cargarPlanes() {
-      this.cargando = true
-      setTimeout(() => {
-        this.planes = [
-          {
-            id: 1,
-            paciente: 'Laura Gutiérrez',
-            objetivo: 'Aumentar masa muscular',
-            calorias: 2200,
-            distribucion: '40% CHO / 30% PRO / 30% GRASA',
-            observaciones: 'Incluir colaciones post entrenamiento.'
-          },
-          {
-            id: 2,
-            paciente: 'Juan Pérez',
-            objetivo: 'Bajar peso',
-            calorias: 1800,
-            distribucion: '45% CHO / 25% PRO / 30% GRASA',
-            observaciones: 'Reducir pan y azúcar, aumentar vegetales.'
-          }
-        ]
-        this.planesFiltrados = [...this.planes]
-        this.cargando = false
-      }, 800)
+    async cargarPlanes() {
+      this.cargando = true;
+      try {
+        const res = await axios.get(`${process.env.VUE_APP_API_URL}/ficha`);
+        const fichas = res.data;
+
+        const planesExtraidos = fichas.flatMap((ficha) => {
+          if (!Array.isArray(ficha.planesNutricionales)) return [];
+
+          return ficha.planesNutricionales.map((plan) => ({
+            id: plan.id,
+            paciente: ficha.fkUsuario?.nombre || "Sin nombre",
+            rut: ficha.fkUsuario?.rut || "N/A",
+            objetivo: plan.objetivoPlan,
+            calorias: plan.calorias || "N/D", // si no tienes campo, puedes omitir o agregar después
+            distribucion: plan.distribucion || "N/D",
+            observaciones: plan.recomendacionInicial,
+            diagnostico: plan.diagnosticoNutricional,
+          }));
+        });
+
+        this.planes = planesExtraidos;
+        this.planesFiltrados = [...this.planes];
+      } catch (error) {
+        console.error("Error al cargar planes:", error);
+      } finally {
+        this.cargando = false;
+      }
     },
     filtrarPlanes() {
-      const termino = this.busqueda.toLowerCase()
-      this.planesFiltrados = this.planes.filter(p =>
-        p.paciente.toLowerCase().includes(termino)
-      )
+      const termino = this.busqueda.toLowerCase();
+      this.planesFiltrados = this.planes.filter((p) =>
+        (p.paciente + " " + p.rut).toLowerCase().includes(termino)
+      );
     },
     editarPlan(plan) {
-      this.$router.push({ name: 'EditarPlanNutricional', params: { id: plan.id } })
-    }
-  }
-}
+  localStorage.setItem("planParaEditar", JSON.stringify(plan));
+  this.$router.push({
+    name: "EditarPlanNutricional",
+    params: { id: plan.id },
+  });
+    },
+  },
+};
 </script>
+
 
 <style scoped>
 .plan-container {
