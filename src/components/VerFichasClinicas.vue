@@ -797,7 +797,10 @@ export default {
 
       try {
         const response = await axios.get(
-          `${process.env.VUE_APP_API_URL}/pdf-manager/plan-nutricional/${planNutricionalId}?email=${this.enviarPorCorreo}`
+          `${process.env.VUE_APP_API_URL}/pdf-manager/plan-nutricional/${planNutricionalId}?email=${this.enviarPorCorreo}`,
+          {
+            responseType: "blob",
+          }
         );
 
         // Si no envía por email, descargamos el PDF
