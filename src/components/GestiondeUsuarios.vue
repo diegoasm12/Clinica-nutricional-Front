@@ -1,7 +1,11 @@
 <template>
   <div class="gestion-container">
     <div class="gestion-content">
-      <div v-if="mostrarNotificacion" class="notificacion" :class="tipoNotificacion">
+      <div
+        v-if="mostrarNotificacion"
+        class="notificacion"
+        :class="tipoNotificacion"
+      >
         {{ mensajeNotificacion }}
       </div>
 
@@ -11,12 +15,12 @@
         <h2 class="section-title">Buscar por nombre o email</h2>
         <div class="form-group">
           <label class="form-label">Ingrese nombre o email</label>
-          <input 
-            v-model="busqueda" 
-            placeholder="Ej: juan.perez@empresa.cl" 
+          <input
+            v-model="busqueda"
+            placeholder="Ej: juan.perez@empresa.cl"
             class="form-input"
             @input="filtrarUsuarios"
-          >
+          />
         </div>
       </div>
 
@@ -29,7 +33,11 @@
       </div>
 
       <div v-else class="users-list">
-        <div v-for="usuario in usuariosFiltrados" :key="usuario.id" class="user-card">
+        <div
+          v-for="usuario in usuariosFiltrados"
+          :key="usuario.id"
+          class="user-card"
+        >
           <div class="user-info">
             <h3>{{ usuario.nombre }}</h3>
             <div class="user-details">
@@ -45,7 +53,9 @@
               <span>{{ formatoFecha(usuario.ultimoAcceso) }}</span>
             </div>
           </div>
-          <button class="submit-button" @click="editarUsuario(usuario)">Editar Usuario</button>
+          <button class="submit-button" @click="editarUsuario(usuario)">
+            Editar Usuario
+          </button>
         </div>
       </div>
     </div>
@@ -54,61 +64,77 @@
 
 <script>
 export default {
-  name: 'GestionUsuarios',
+  name: "GestionUsuarios",
   data() {
     return {
-      busqueda: '',
+      busqueda: "",
       cargando: false,
       usuarios: [],
       usuariosFiltrados: [],
       mostrarNotificacion: false,
-      mensajeNotificacion: '',
-      tipoNotificacion: 'info',
-      timeoutNotificacion: null
-    }
+      mensajeNotificacion: "",
+      tipoNotificacion: "info",
+      timeoutNotificacion: null,
+    };
   },
   created() {
-    this.cargarUsuarios()
+    this.cargarUsuarios();
   },
   methods: {
-    mostrarNotificacionTemporal(mensaje, tipo = 'info', duracion = 3000) {
-      if (this.timeoutNotificacion) clearTimeout(this.timeoutNotificacion)
-      this.mostrarNotificacion = true
-      this.mensajeNotificacion = mensaje
-      this.tipoNotificacion = tipo
-      this.timeoutNotificacion = setTimeout(() => {
-        this.mostrarNotificacion = false
-      }, duracion)
+    async cargarUsuarios() {
+      this.cargando = true;
+      try {
+        const response = await fetch(`${process.env.VUE_APP_API_URL}/usuario`);
+        const data = await response.json();
+
+        // Transformar los usuarios según el formato esperado en tu lista
+        this.usuarios = data.map((usuario) => ({
+          id: usuario.id,
+          nombre: usuario.nombre,
+          email: usuario.correo, // Ojo aquí, en tu API viene como "correo"
+          rol: usuario.rRolUsuario?.[0]?.fkRol?.rol || "Sin rol asignado",
+          ultimoAcceso: usuario.fechaNacimiento, // No tienes último acceso real, pero muestro nacimiento como ejemplo
+        }));
+
+        this.usuariosFiltrados = [...this.usuarios];
+      } catch (error) {
+        console.error("Error al cargar usuarios:", error);
+        this.mostrarNotificacionTemporal("Error al cargar usuarios", "error");
+      } finally {
+        this.cargando = false;
+      }
     },
-    cargarUsuarios() {
-      this.cargando = true
-      // Simulación de carga
-      setTimeout(() => {
-        this.usuarios = [
-          { id: 1, nombre: 'Diego Soto', email: 'diego@demo.com', rol: 'Admin', ultimoAcceso: '2025-05-24' },
-          { id: 2, nombre: 'Juan Mella', email: 'juan@demo.com', rol: 'Nutricionista', ultimoAcceso: '2025-05-23' },
-          { id: 3, nombre: 'Fernando Lucena', email: 'fernando@demo.com', rol: 'Asistente', ultimoAcceso: '2025-05-22' }
-        ]
-        this.usuariosFiltrados = [...this.usuarios]
-        this.cargando = false
-      }, 800)
+
+    mostrarNotificacionTemporal(mensaje, tipo = "info", duracion = 3000) {
+      if (this.timeoutNotificacion) clearTimeout(this.timeoutNotificacion);
+      this.mostrarNotificacion = true;
+      this.mensajeNotificacion = mensaje;
+      this.tipoNotificacion = tipo;
+      this.timeoutNotificacion = setTimeout(() => {
+        this.mostrarNotificacion = false;
+      }, duracion);
     },
     filtrarUsuarios() {
-      const termino = this.busqueda.toLowerCase()
-      this.usuariosFiltrados = this.usuarios.filter(u =>
-        u.nombre.toLowerCase().includes(termino) ||
-        u.email.toLowerCase().includes(termino)
-      )
+      const termino = this.busqueda.toLowerCase();
+      this.usuariosFiltrados = this.usuarios.filter(
+        (u) =>
+          u.nombre.toLowerCase().includes(termino) ||
+          u.email.toLowerCase().includes(termino)
+      );
     },
     formatoFecha(fecha) {
-      if (!fecha) return 'N/A'
-      return new Date(fecha).toLocaleDateString('es-CL', { year: 'numeric', month: '2-digit', day: '2-digit' })
+      if (!fecha) return "N/A";
+      return new Date(fecha).toLocaleDateString("es-CL", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      });
     },
     editarUsuario(usuario) {
-      this.$router.push({ name: 'EditarUsuario', params: { id: usuario.id } })
-    }
-  }
-}
+      this.$router.push({ name: "EditarUsuario", params: { id: usuario.id } });
+    },
+  },
+};
 </script>
 
 <style scoped>
