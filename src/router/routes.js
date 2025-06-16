@@ -14,6 +14,8 @@ import GestiondeUsuarios from "../components/GestiondeUsuarios.vue";
 import GestiondeRoles from "../components/GestiondeRoles.vue";
 import VerPlanNutricional from "../components/VerPlanNutricional.vue";
 import ConsultarEstadoFicha from "../components/ConsultarEstadoFicha.vue";
+import EditarPlan from "../components/EditarPlan.vue";
+
 
 // Lazy loading para las demás páginas
 const Dashboard = () => import("@/pages/Dashboard.vue");
@@ -67,6 +69,11 @@ const routes = [
         name: "profile",
         component: Profile,
       },
+      {
+        path: "/editar-plan/:id",
+        name: "EditarPlanNutricional",
+        component: EditarPlan
+      },     
       {
         path: "notifications",
         name: "notifications",
