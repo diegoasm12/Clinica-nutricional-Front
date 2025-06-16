@@ -13,11 +13,6 @@
           icon="tim-icons icon-atom"
         />
         <sidebar-link
-          to="/maps"
-          name="Gestión de Roles"
-          icon="tim-icons icon-pin"
-        />
-        <sidebar-link
           to="/admin/evaluacionNutricional"
           name="Evaluacion Nutricional"
           icon="tim-icons icon-chart-pie-36"
@@ -42,7 +37,6 @@
           name="Planes Nutricionales"
           icon="tim-icons icon-pin"
         />
-
       </template>
     </side-bar>
     <div class="main-panel">
