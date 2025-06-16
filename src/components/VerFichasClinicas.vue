@@ -436,6 +436,48 @@
           </div>
         </div>
 
+        <div
+          v-if="showExportModal"
+          class="modal-overlay"
+          @click.self="showExportModal = false"
+        >
+          <div class="modal-content">
+            <h3 style="color: #2c3e50; margin-bottom: 20px">
+              ¿Desea enviar el plan alimenticio al correo?
+            </h3>
+
+            <div class="form-group">
+              <label class="form-label">Enviar por correo</label>
+              <select v-model="enviarPorCorreo" class="form-input">
+                <option :value="false">No, solo descargar</option>
+                <option :value="true">Sí, enviar por correo</option>
+              </select>
+            </div>
+
+            <div
+              style="
+                margin-top: 20px;
+                display: flex;
+                gap: 10px;
+                justify-content: flex-end;
+              "
+            >
+              <button
+                class="action-button primary"
+                @click="confirmarExportacion"
+              >
+                Confirmar Exportación
+              </button>
+              <button
+                class="action-button cancel"
+                @click="showExportModal = false"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div class="modal-footer">
           <button @click="editarFicha" class="action-button secondary">
             Editar ficha
@@ -513,6 +555,8 @@ export default {
       archivos: [],
       showRegistro24h: false,
       showPlanNutricional: false,
+      showExportModal: false,
+      enviarPorCorreo: false,
     };
   },
   components: {
@@ -677,15 +721,47 @@ export default {
       alert("Antropometría guardada (simulado)");
     },
     exportarPlan() {
-      const rut = this.fichaSeleccionada?.fkUsuario?.rut;
-      if (!rut) return alert("RUT no disponible");
-      alert(`Se exportará plan alimenticio para RUT: ${rut}`);
+      this.enviarPorCorreo = false;
+      this.showExportModal = true;
     },
     exportarFicha() {
       const rut = this.fichaSeleccionada?.fkUsuario?.rut;
       if (!rut) return alert("RUT no disponible");
       alert(`Se exportará ficha completa para RUT: ${rut}`);
     },
+    async confirmarExportacion() {
+      if (!this.fichaSeleccionada.planesNutricionales?.length) {
+        alert("No existe plan nutricional registrado.");
+        return;
+      }
+
+      const planNutricionalId =
+        this.fichaSeleccionada.planesNutricionales[0].id;
+
+      try {
+        const response = await axios.get(
+          `${process.env.VUE_APP_API_URL}/pdf-manager/plan-nutricional/${planNutricionalId}?email=${this.enviarPorCorreo}`
+        );
+
+        // Si no envía por email, descargamos el PDF
+        if (!this.enviarPorCorreo) {
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "PlanNutricional.pdf");
+          document.body.appendChild(link);
+          link.click();
+        }
+
+        alert("Exportación realizada correctamente");
+      } catch (err) {
+        console.error("Error exportando plan nutricional", err);
+        alert("Ocurrió un error al exportar.");
+      } finally {
+        this.showExportModal = false;
+      }
+    },
+
     getFileIcon(tipo) {
       if (tipo === "pdf") return "fas fa-file-pdf";
       if (tipo === "docx") return "fas fa-file-word";
@@ -1297,5 +1373,21 @@ export default {
   .archivo-acciones {
     justify-content: flex-end;
   }
+}
+select.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #f7fafc;
+  color: #2c3e50;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234a5568' class='bi bi-caret-down-fill' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14l-4.796-5.481c-.566-.648-.106-1.659.753-1.659h9.592c.86 0 1.32 1.011.753 1.659l-4.796 5.481a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
 }
 </style>
