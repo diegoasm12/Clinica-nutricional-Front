@@ -427,6 +427,12 @@
             </div>
           </div>
         </div>
+        <!-- Sección gráfica -->
+<div v-if="fichaSeleccionada.antropometrias?.length" class="detalle-section">
+  <h3 class="text-dark">Gráfico de evolución</h3>
+  <GraficaEvolucion :historial="fichaSeleccionada.antropometrias" />
+</div>
+
 
         <div class="modal-footer">
           <button @click="editarFicha" class="action-button secondary">
@@ -489,6 +495,9 @@ import axios from "axios";
 import ControlPeriodico from "./ControlPeriodico.vue";
 import Registro24Horas from "./Registro24hHoras.vue";
 import PlanNutricional from "./PlanNutricional.vue";
+import GraficaEvolucion from './GraficaEvolucion.vue';
+
+
 
 export default {
   data() {
@@ -510,6 +519,8 @@ export default {
     ControlPeriodico,
     Registro24Horas,
     PlanNutricional,
+    GraficaEvolucion,
+
   },
   mounted() {
     this.obtenerFichas();
