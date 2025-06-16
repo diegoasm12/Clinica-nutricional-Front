@@ -6,60 +6,69 @@
 </template>
 
 <script>
-import Chart from 'chart.js'
+import Chart from "chart.js";
 
 export default {
-  name: 'GraficaEvolucion',
+  name: "GraficaEvolucion",
   props: {
     historial: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
   mounted() {
-    this.dibujarGrafico()
+    this.dibujarGrafico();
   },
   methods: {
     dibujarGrafico() {
-      const labels = this.historial.map(item => new Date(item.fecha).toLocaleDateString('es-CL'))
-      const pesos = this.historial.map(item => item.peso)
-      const imcs = this.historial.map(item => item.imc)
+      // Ordenamos por fecha de creación de forma ascendente
+      const historialOrdenado = [...this.historial].sort((a, b) => {
+        return new Date(a.fechaCreacion) - new Date(b.fechaCreacion);
+      });
+
+      // Generamos los labels desde las fechas de creación ya ordenadas
+      const labels = historialOrdenado.map((item) =>
+        new Date(item.fechaCreacion).toLocaleDateString("es-CL")
+      );
+
+      const pesos = historialOrdenado.map((item) => item.peso);
+      const imcs = historialOrdenado.map((item) => item.imc);
 
       new Chart(this.$refs.graficoCanvas, {
-        type: 'line',
+        type: "line",
         data: {
           labels,
           datasets: [
             {
-              label: 'Peso (kg)',
+              label: "Peso (kg)",
               data: pesos,
-              borderColor: 'rgba(75, 192, 192, 1)',
-              backgroundColor: 'rgba(75, 192, 192, 0.2)',
-              lineTension: 0.3 // <- Chart.js 2.x usa 'lineTension' en vez de 'tension'
+              borderColor: "rgba(75, 192, 192, 1)",
+              backgroundColor: "rgba(75, 192, 192, 0.2)",
+              lineTension: 0.3,
             },
             {
-              label: 'IMC',
+              label: "IMC",
               data: imcs,
-              borderColor: 'rgba(179, 95, 195, 1)',
-              backgroundColor: 'rgba(179, 95, 195, 0.2)',
-              lineTension: 0.3
-            }
-          ]
+              borderColor: "rgba(179, 95, 195, 1)",
+              backgroundColor: "rgba(179, 95, 195, 0.2)",
+              lineTension: 0.3,
+            },
+          ],
         },
         options: {
           responsive: true,
           title: {
             display: true,
-            text: 'Evolución de Peso e IMC'
+            text: "Evolución de Peso e IMC",
           },
           legend: {
-            position: 'top'
-          }
-        }
-      })
-    }
-  }
-}
+            position: "top",
+          },
+        },
+      });
+    },
+  },
+};
 </script>
 
 <style scoped>
