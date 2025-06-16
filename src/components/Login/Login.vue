@@ -123,7 +123,7 @@ export default {
           localStorage.setItem("token", token);
 
           // Redirigimos al usuario
-          this.$router.push("/admin/verfichasclinicas");
+          this.$router.push("/admin/dashboard");
         }
       } catch (error) {
         if (error.response) {

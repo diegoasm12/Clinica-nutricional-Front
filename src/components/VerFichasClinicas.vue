@@ -577,6 +577,23 @@ export default {
     },
   },
   methods: {
+    getRutFromToken() {
+      const token = this.getToken();
+      if (!token) return null;
+
+      const payload = token.split(".")[1];
+      const base = decodeURIComponent(
+        Array.prototype.map
+          .call(atob(payload), function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join("")
+      );
+
+      const parsed = JSON.parse(base);
+      return parsed.rut || null;
+    },
+
     getToken() {
       return localStorage.getItem("token") || "";
     },
@@ -662,14 +679,25 @@ export default {
       this.loading = true;
       try {
         const res = await axios.get(`${process.env.VUE_APP_API_URL}/ficha`);
-        this.fichas = res.data;
-        this.filtrarFichas(); // aplicar filtro inicial
+        let todasFichas = res.data;
+
+        if (this.userRole === "Paciente") {
+          const rutPaciente = this.getRutFromToken();
+
+          todasFichas = todasFichas.filter(
+            (ficha) => ficha.fkUsuario?.rut == rutPaciente
+          );
+        }
+
+        this.fichas = todasFichas;
+        this.filtrarFichas();
       } catch (err) {
         console.error("Error al obtener fichas:", err);
       } finally {
         this.loading = false;
       }
     },
+
     filtrarFichas() {
       const termino = this.busqueda.toLowerCase();
       this.fichasFiltradas = this.fichas.filter((ficha) => {
