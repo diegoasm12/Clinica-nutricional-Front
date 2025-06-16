@@ -7,8 +7,8 @@
         <h2 class="section-title">Buscar por paciente</h2>
         <div class="form-group">
           <label class="form-label">Nombre o RUT</label>
-          <input 
-            v-model="busqueda" 
+          <input
+            v-model="busqueda"
             placeholder="Ej: Laura Gutiérrez o 12.345.678-9"
             class="form-input"
             @input="filtrarPlanes"
@@ -32,7 +32,9 @@
           <p><strong>Distribución:</strong> {{ plan.distribucion }}</p>
           <p><strong>Diagnóstico:</strong> {{ plan.diagnostico }}</p>
           <p><strong>Observaciones:</strong> {{ plan.observaciones }}</p>
-          <button class="submit-button" @click="editarPlan(plan)">Editar Plan</button>
+          <button class="submit-button" @click="editarPlan(plan)">
+            Editar Plan
+          </button>
         </div>
       </div>
     </div>
@@ -74,6 +76,7 @@ export default {
             distribucion: plan.distribucion || "N/D",
             observaciones: plan.recomendacionInicial,
             diagnostico: plan.diagnosticoNutricional,
+            planAlimentario: plan.planAlimentario,
           }));
         });
 
@@ -92,16 +95,16 @@ export default {
       );
     },
     editarPlan(plan) {
-  localStorage.setItem("planParaEditar", JSON.stringify(plan));
-  this.$router.push({
-    name: "EditarPlanNutricional",
-    params: { id: plan.id },
-  });
+      console.log("guarda", plan);
+      localStorage.setItem("planParaEditar", JSON.stringify(plan));
+      this.$router.push({
+        name: "EditarPlanNutricional",
+        params: { id: plan.id },
+      });
     },
   },
 };
 </script>
-
 
 <style scoped>
 .plan-container {

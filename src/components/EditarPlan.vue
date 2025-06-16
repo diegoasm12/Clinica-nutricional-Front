@@ -6,22 +6,38 @@
       <form @submit.prevent="guardarCambios" class="control-form">
         <div class="form-group">
           <label>Objetivo del Plan</label>
-          <textarea v-model="plan.objetivoPlan" class="form-textarea" required></textarea>
+          <textarea
+            v-model="plan.objetivoPlan"
+            class="form-textarea"
+            required
+          ></textarea>
         </div>
 
         <div class="form-group">
           <label>Recomendación Inicial</label>
-          <textarea v-model="plan.recomendacionInicial" class="form-textarea" required></textarea>
+          <textarea
+            v-model="plan.recomendacionInicial"
+            class="form-textarea"
+            required
+          ></textarea>
         </div>
 
         <div class="form-group">
           <label>Plan Alimentario</label>
-          <textarea v-model="plan.planAlimentario" class="form-textarea" required></textarea>
+          <textarea
+            v-model="plan.planAlimentario"
+            class="form-textarea"
+            required
+          ></textarea>
         </div>
 
         <div class="form-group">
           <label>Diagnóstico Nutricional</label>
-          <textarea v-model="plan.diagnosticoNutricional" class="form-textarea" required></textarea>
+          <textarea
+            v-model="plan.diagnosticoNutricional"
+            class="form-textarea"
+            required
+          ></textarea>
         </div>
 
         <div class="form-actions">
@@ -49,7 +65,7 @@ export default {
   },
   created() {
     const planGuardado = localStorage.getItem("planParaEditar");
-
+    console.log(planGuardado);
     if (planGuardado) {
       const datos = JSON.parse(planGuardado);
       this.plan = {
@@ -66,7 +82,9 @@ export default {
     async cargarPlan() {
       try {
         const id = this.$route.params.id;
-        const res = await axios.get(`${process.env.VUE_APP_API_URL}/plan-nutricional/${id}`);
+        const res = await axios.get(
+          `${process.env.VUE_APP_API_URL}/plan-nutricional/${id}`
+        );
         this.plan = {
           objetivoPlan: res.data.objetivoPlan,
           recomendacionInicial: res.data.recomendacionInicial,
@@ -81,7 +99,10 @@ export default {
     async guardarCambios() {
       try {
         const id = this.$route.params.id;
-        await axios.patch(`${process.env.VUE_APP_API_URL}/plan-nutricional/${id}`, this.plan);
+        await axios.patch(
+          `${process.env.VUE_APP_API_URL}/plan-nutricional/${id}`,
+          this.plan
+        );
         alert("Cambios guardados correctamente");
 
         // Eliminar el plan del localStorage después de guardar
@@ -96,7 +117,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .editar-plan-container {
