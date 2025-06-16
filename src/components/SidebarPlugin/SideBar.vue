@@ -8,7 +8,7 @@
     <div class="sidebar-wrapper" id="style-3">
       <div class="logo">
         <a
-          href="http://www.creative-tim.com"
+          href=""
           aria-label="sidebar mini logo"
           class="simple-text logo-mini"
         >
