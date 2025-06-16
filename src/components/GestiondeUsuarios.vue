@@ -59,6 +59,52 @@
         </div>
       </div>
     </div>
+    <div v-if="mostrarModal" class="modal-overlay" @click.self="cerrarModal">
+      <div class="modal-content">
+        <h2>Editar Usuario</h2>
+
+        <div class="form-group">
+          <label>Nombre:</label>
+          <input v-model="usuarioEdit.nombre" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Correo:</label>
+          <input v-model="usuarioEdit.correo" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Teléfono:</label>
+          <input
+            v-model="usuarioEdit.telefono"
+            class="form-input"
+            type="number"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>RUT:</label>
+          <input v-model="usuarioEdit.rut" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Sexo:</label>
+          <select v-model="usuarioEdit.sexo" class="form-input">
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+          </select>
+        </div>
+
+        <div class="form-buttons">
+          <button class="submit-button" @click="guardarEdicionUsuario">
+            Guardar Cambios
+          </button>
+          <button class="submit-button cancel" @click="cerrarModal">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -75,12 +121,70 @@ export default {
       mensajeNotificacion: "",
       tipoNotificacion: "info",
       timeoutNotificacion: null,
+      mostrarModal: false,
+      usuarioEdit: {
+        id: null,
+        nombre: "",
+        correo: "",
+        telefono: "",
+        rut: "",
+        sexo: "",
+      },
     };
   },
   created() {
     this.cargarUsuarios();
   },
   methods: {
+    editarUsuario(usuario) {
+      this.usuarioEdit = {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        correo: usuario.email,
+        telefono: usuario.telefono || "",
+        rut: usuario.rut || "",
+        sexo: usuario.sexo || "M",
+      };
+      this.mostrarModal = true;
+    },
+    async guardarEdicionUsuario() {
+      try {
+        const payload = {
+          nombre: this.usuarioEdit.nombre,
+          correo: this.usuarioEdit.correo,
+          telefono: Number(this.usuarioEdit.telefono),
+          rut: this.usuarioEdit.rut,
+          sexo: this.usuarioEdit.sexo,
+        };
+
+        await fetch(
+          `${process.env.VUE_APP_API_URL}/usuario/${this.usuarioEdit.id}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        this.mostrarNotificacionTemporal(
+          "Usuario actualizado correctamente",
+          "success"
+        );
+        alert("Usuario actualizado correctamente");
+
+        this.mostrarModal = false;
+        this.cargarUsuarios(); // Recarga la lista completa
+      } catch (error) {
+        console.error("Error al actualizar usuario:", error);
+        this.mostrarNotificacionTemporal(
+          "Error al actualizar usuario",
+          "error"
+        );
+      }
+    },
+    cerrarModal() {
+      this.mostrarModal = false;
+    },
     async cargarUsuarios() {
       this.cargando = true;
       try {
@@ -91,9 +195,12 @@ export default {
         this.usuarios = data.map((usuario) => ({
           id: usuario.id,
           nombre: usuario.nombre,
-          email: usuario.correo, // Ojo aquí, en tu API viene como "correo"
+          email: usuario.correo,
           rol: usuario.rRolUsuario?.[0]?.fkRol?.rol || "Sin rol asignado",
-          ultimoAcceso: usuario.fechaNacimiento, // No tienes último acceso real, pero muestro nacimiento como ejemplo
+          ultimoAcceso: usuario.fechaNacimiento,
+          telefono: usuario.telefono || "",
+          rut: usuario.rut || "",
+          sexo: usuario.sexo || "",
         }));
 
         this.usuariosFiltrados = [...this.usuarios];
@@ -129,9 +236,6 @@ export default {
         month: "2-digit",
         day: "2-digit",
       });
-    },
-    editarUsuario(usuario) {
-      this.$router.push({ name: "EditarUsuario", params: { id: usuario.id } });
     },
   },
 };
@@ -248,5 +352,43 @@ export default {
 .submit-button:hover {
   background-color: #9e4fb0;
   transform: translateY(-2px);
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: #1a202c;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem; /* separación uniforme entre botones */
+  margin-top: 1.5rem;
+}
+
+button.cancel {
+  background-color: #718096;
+}
+
+button.cancel:hover {
+  background-color: #4a5568;
+}
+button.submit-button {
+  width: 150px;
 }
 </style>
