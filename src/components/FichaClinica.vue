@@ -284,6 +284,7 @@
 
 <script>
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default {
   name: "FichaClinica",
@@ -300,9 +301,15 @@ export default {
     return {
       editando: false,
       fichaId: null,
+      usuarioId: null,
+      anamnesisSocialId: null,
+      anamnesisAlimentariaId: null,
+      anamnesisClinicaId: null,
+      signoSintomaId: null,
+      habitoId: null,
+      encuestaId: null,
       alimentosDisponibles: [],
       form: {
-        // Datos paciente
         rut: "",
         nombre: "",
         email: "",
@@ -310,7 +317,6 @@ export default {
         sexo: "",
         fechaNacimiento: "",
 
-        // Anamnesis Social
         asisteCon: "",
         hijos: "",
         viveCon: "",
@@ -319,21 +325,18 @@ export default {
         redesDeApoyo: "",
         serviciosBasicos: "",
 
-        // Anamnesis Alimentaria
         alergiaIntolerancia: "",
         alimentoNoGusta: "",
         alimentoPreferencia: "",
         cocinaEnCasa: "",
         habitualmenteComeEn: "",
 
-        // Anamnesis Clínica
         antecedenteFamiliar: "",
         patologiaBase: "",
         medicamento: "",
         anetecedenteQuirurgico: "",
         alergia: "",
 
-        // Signos y síntomas
         diuresis: "",
         apetito: "",
         calambre: "",
@@ -345,12 +348,10 @@ export default {
         polifagia: "",
         otroSigno: "",
 
-        // Hábitos
         alcohol: "",
         droga: "",
         actividadFisica: "",
 
-        // Alimentos a enviar
         encuestaConsumo: [],
       },
     };
@@ -384,47 +385,53 @@ export default {
         this.form.sexo = ficha.fkUsuario.sexo;
         this.form.fechaNacimiento = ficha.fkUsuario.fechaNacimiento;
 
-        this.form.asisteCon = ficha.fkAnamnesisSocial?.asisteCon || "";
-        this.form.hijos = ficha.fkAnamnesisSocial?.hijos || "";
-        this.form.viveCon = ficha.fkAnamnesisSocial?.viveCon || "";
-        this.form.ocupacion = ficha.fkAnamnesisSocial?.ocupacion || "";
-        this.form.escolaridad = ficha.fkAnamnesisSocial?.escolaridad || "";
-        this.form.redesDeApoyo = ficha.fkAnamnesisSocial?.redesDeApoyo || "";
-        this.form.serviciosBasicos = ficha.fkAnamnesisSocial?.serviciosBasicos || "";
+        const signos = ficha.fkAnamnesisClinica.signosSintomas[0] || {};
+        const habitos = ficha.fkAnamnesisClinica.habitos[0] || {};
 
-        this.form.alergiaIntolerancia = ficha.fkAnamnesisAlimentaria?.alergiaIntolerancia || "";
-        this.form.alimentoNoGusta = ficha.fkAnamnesisAlimentaria?.alimentoNoGusta || "";
-        this.form.alimentoPreferencia = ficha.fkAnamnesisAlimentaria?.alimentoPreferencia || "";
-        this.form.cocinaEnCasa = ficha.fkAnamnesisAlimentaria?.cocinaEnCasa || "";
-        this.form.habitualmenteComeEn = ficha.fkAnamnesisAlimentaria?.habitualmenteComeEn || "";
+        this.signoSintomaId = signos.id;
+        this.habitoId = habitos.id;
 
-        this.form.antecedenteFamiliar = ficha.fkAnamnesisClinica?.antecedenteFamiliar || "";
-        this.form.patologiaBase = ficha.fkAnamnesisClinica?.patologiaBase || "";
-        this.form.medicamento = ficha.fkAnamnesisClinica?.medicamento || "";
-        this.form.anetecedenteQuirurgico = ficha.fkAnamnesisClinica?.anetecedenteQuirurgico || ficha.fkAnamnesisClinica?.antecedenteQuirurgico || "";
-        this.form.alergia = ficha.fkAnamnesisClinica?.alergia || "";
+        Object.assign(this.form, {
+          asisteCon: ficha.fkAnamnesisSocial.asisteCon || "",
+          hijos: ficha.fkAnamnesisSocial.hijos || "",
+          viveCon: ficha.fkAnamnesisSocial.viveCon || "",
+          ocupacion: ficha.fkAnamnesisSocial.ocupacion || "",
+          escolaridad: ficha.fkAnamnesisSocial.escolaridad || "",
+          redesDeApoyo: ficha.fkAnamnesisSocial.redesDeApoyo || "",
+          serviciosBasicos: ficha.fkAnamnesisSocial.serviciosBasicos || "",
 
-        const signos = ficha.fkAnamnesisClinica?.signosSintomas?.[0] || {};
-        this.form.diuresis = signos.diuresis || "";
-        this.form.apetito = signos.apetito || "";
-        this.form.calambre = signos.calambre || "";
-        this.form.polidipsia = signos.polidipsia || "";
-        this.form.poliuria = signos.poliuria || "";
-        this.form.deposicionBristol = signos.deposicionBristol || "";
-        this.form.tinnitus = signos.tinitus || "";
-        this.form.sudoracionNocturna = signos.sudoracionNocturna || "";
-        this.form.polifagia = signos.polifagia || "";
-        this.form.otroSigno = signos.otro || "";
+          alergiaIntolerancia: ficha.fkAnamnesisAlimentaria.alergiaIntolerancia || "",
+          alimentoNoGusta: ficha.fkAnamnesisAlimentaria.alimentoNoGusta || "",
+          alimentoPreferencia: ficha.fkAnamnesisAlimentaria.alimentoPreferencia || "",
+          cocinaEnCasa: ficha.fkAnamnesisAlimentaria.cocinaEnCasa || "",
+          habitualmenteComeEn: ficha.fkAnamnesisAlimentaria.habitualmenteComeEn || "",
 
-        const habitos = ficha.fkAnamnesisClinica?.habitos?.[0] || {};
-        this.form.alcohol = habitos.alcohol || "";
-        this.form.droga = habitos.droga || "";
-        this.form.actividadFisica = habitos.actividadFisica || "";
+          antecedenteFamiliar: ficha.fkAnamnesisClinica.antecedenteFamiliar || "",
+          patologiaBase: ficha.fkAnamnesisClinica.patologiaBase || "",
+          medicamento: ficha.fkAnamnesisClinica.medicamento || "",
+          anetecedenteQuirurgico: ficha.fkAnamnesisClinica.anetecedenteQuirurgico || ficha.fkAnamnesisClinica.antecedenteQuirurgico || "",
+          alergia: ficha.fkAnamnesisClinica.alergia || "",
 
-        this.form.encuestaConsumo = ficha.fkEncuestaTendenciaConsumo?.rEncuestaTendenciaConsumoAlimento?.map(item => ({
-          fkAlimento_id: item.fkAlimento?.id,
+          diuresis: signos.diuresis || "",
+          apetito: signos.apetito || "",
+          calambre: signos.calambre || "",
+          polidipsia: signos.polidipsia || "",
+          poliuria: signos.poliuria || "",
+          deposicionBristol: signos.deposicionBristol || "",
+          tinnitus: signos.tinitus || "",
+          sudoracionNocturna: signos.sudoracionNocturna || "",
+          polifagia: signos.polifagia || "",
+          otroSigno: signos.otro || "",
+
+          alcohol: habitos.alcohol || "",
+          droga: habitos.droga || "",
+          actividadFisica: habitos.actividadFisica || "",
+        });
+
+        this.form.encuestaConsumo = ficha.fkEncuestaTendenciaConsumo.rEncuestaTendenciaConsumoAlimento.map(item => ({
+          fkAlimento_id: item.fkAlimento.id,
           cuantosDiasSemana: item.cuantosDiasSemana
-        })) || [];
+        }));
       } catch (error) {
         console.error("Error al cargar ficha para edición:", error);
       }
@@ -444,7 +451,6 @@ export default {
     async handleSubmit() {
       try {
         const fechaFormateada = new Date(this.form.fechaNacimiento).toISOString();
-
         const usuarioPayload = {
           rut: this.form.rut,
           nombre: this.form.nombre,
@@ -455,7 +461,49 @@ export default {
         };
 
         if (this.editando) {
-          // PUTs
+          await axios.patch(`${process.env.VUE_APP_API_URL}/usuario/${this.usuarioId}`, usuarioPayload);
+          await axios.patch(`${process.env.VUE_APP_API_URL}/anamnesis-social/${this.anamnesisSocialId}`, {
+          asisteCon: this.form.asisteCon,
+          hijos: this.form.hijos,
+          viveCon: this.form.viveCon,
+          ocupacion: this.form.ocupacion,
+          escolaridad: this.form.escolaridad,
+          redesDeApoyo: this.form.redesDeApoyo,
+          serviciosBasicos: this.form.serviciosBasicos
+        });
+          await axios.patch(`${process.env.VUE_APP_API_URL}/anamnesis-alimentaria/${this.anamnesisAlimentariaId}`, {
+              alimentoNoGusta: this.form.alimentoNoGusta,
+              alimentoPreferencia: this.form.alimentoPreferencia,
+              cocinaEnCasa: this.form.cocinaEnCasa,
+              habitualmenteComeEn: this.form.habitualmenteComeEn,
+              alergiaIntolerancia: this.form.alergiaIntolerancia
+            });          
+          await axios.patch(`${process.env.VUE_APP_API_URL}/anamnesis-clinica/${this.anamnesisClinicaId}`, {
+            antecedenteFamiliar: this.form.antecedenteFamiliar,
+            patologiaBase: this.form.patologiaBase,
+            medicamento: this.form.medicamento,
+            anetecedenteQuirurgico: this.form.anetecedenteQuirurgico,
+            alergia: this.form.alergia,
+          });
+          await axios.patch(`${process.env.VUE_APP_API_URL}/signo-sintoma/${this.signoSintomaId}`, {
+          diuresis: this.form.diuresis,
+          apetito: this.form.apetito,
+          calambre: this.form.calambre,
+          polidipsia: this.form.polidipsia,
+          poliuria: this.form.poliuria,
+          deposicionBristol: this.form.deposicionBristol,
+          tinitus: this.form.tinitus,
+          sudoracionNocturna: this.form.sudoracionNocturna,
+          polifagia: this.form.polifagia,
+          otro: this.form.otro
+        });
+          await axios.patch(`${process.env.VUE_APP_API_URL}/habito/${this.habitoId}`, {
+          alcohol: this.form.alcohol,
+          droga: this.form.droga,
+          actividadFisica: this.form.actividadFisica
+        });
+
+          Swal.fire({ icon: 'success', title: 'Ficha actualizada correctamente', confirmButtonColor: '#b35fc3' });
         } else {
           const resUsuario = await axios.post(`${process.env.VUE_APP_API_URL}/usuario`, {
             ...usuarioPayload,
@@ -523,16 +571,17 @@ export default {
             fkEncuestaTendenciaConsumo_id: resEncuesta.data.id,
           });
 
-          alert("✅ Ficha creada correctamente");
+          Swal.fire({ icon: 'success', title: 'Ficha creada correctamente', confirmButtonColor: '#b35fc3' });
         }
       } catch (error) {
         console.error(error);
-        alert("❌ Error al guardar la ficha");
+        Swal.fire({ icon: 'error', title: 'Error al guardar la ficha', confirmButtonColor: '#b35fc3' });
       }
     },
   },
 };
 </script>
+
 
 
 
