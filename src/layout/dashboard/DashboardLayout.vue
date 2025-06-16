@@ -12,11 +12,11 @@
           name="Ver Fichas Clnicas"
           icon="tim-icons icon-atom"
         />
-        <sidebar-link
+        <!-- <sidebar-link
           to="/admin/evaluacionNutricional"
           name="Evaluacion Nutricional"
           icon="tim-icons icon-chart-pie-36"
-        />
+        /> -->
         <sidebar-link
           to="/admin/listaPacientes"
           name="Ver Pacientes"
