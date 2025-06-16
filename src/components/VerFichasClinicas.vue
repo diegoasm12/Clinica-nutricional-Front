@@ -325,6 +325,43 @@
             <p>No existen registros de 24 horas.</p>
           </div>
 
+          <!-- Plan Nutricional -->
+          <div
+            class="detalle-section"
+            v-if="fichaSeleccionada.planesNutricionales?.length"
+          >
+            <h3 class="text-dark">Historial Plan Nutricional</h3>
+
+            <div
+              v-for="(plan, index) in fichaSeleccionada.planesNutricionales"
+              :key="plan.id"
+              class="consulta-item"
+            >
+              <p class="text-dark">
+                <strong>Fecha de Creación:</strong> {{ plan.fechaCreacion }}
+              </p>
+              <p class="text-dark">
+                <strong>Objetivo del Plan:</strong> {{ plan.objetivoPlan }}
+              </p>
+              <p class="text-dark">
+                <strong>Recomendación Inicial:</strong>
+                {{ plan.recomendacionInicial }}
+              </p>
+              <p class="text-dark">
+                <strong>Plan Alimentario:</strong> {{ plan.planAlimentario }}
+              </p>
+              <p class="text-dark">
+                <strong>Diagnóstico Nutricional:</strong>
+                {{ plan.diagnosticoNutricional }}
+              </p>
+            </div>
+          </div>
+
+          <div v-else class="detalle-section">
+            <h3>Historial Plan Nutricional</h3>
+            <p>No existen planes nutricionales registrados.</p>
+          </div>
+
           <!-- Archivos adjuntos -->
           <div class="detalle-section">
             <h3>Archivos Adjuntos</h3>
@@ -387,13 +424,6 @@
               <button class="action-button primary" @click="exportarPlan">
                 Exportar plan alimenticio
               </button>
-              <button
-                class="action-button primary"
-                @click="exportarFicha"
-                style="margin-left: 10px"
-              >
-                Exportar ficha
-              </button>
             </div>
           </div>
         </div>
@@ -408,10 +438,14 @@
           <button @click="abrirAntropometria" class="action-button control">
             Agregar Antropometría
           </button>
-          <button @click="abrirRegistro24h" class="action-button control">
-            Agregar Registro 24 Horas
+          <button @click="abrirRegistro24h" class="action-button history">
+            Registro 24 Horas
           </button>
-          <button @click="subirExamen" class="action-button control">
+          <button @click="abrirPlanNutricional" class="action-button plan">
+            Agregar Plan Nutricional
+          </button>
+
+          <button @click="subirExamen" class="action-button subir">
             Subir Examen
           </button>
 
@@ -441,6 +475,12 @@
       @guardado="actualizarRegistros24h"
       @cerrar="showRegistro24h = false"
     />
+    <PlanNutricional
+      v-if="showPlanNutricional && fichaSeleccionada"
+      :ficha-id="fichaSeleccionada.id"
+      @cerrar="showPlanNutricional = false"
+      @guardado="actualizarPlanes"
+    />
   </div>
 </template>
 
@@ -448,6 +488,7 @@
 import axios from "axios";
 import ControlPeriodico from "./ControlPeriodico.vue";
 import Registro24Horas from "./Registro24hHoras.vue";
+import PlanNutricional from "./PlanNutricional.vue";
 
 export default {
   data() {
@@ -462,16 +503,22 @@ export default {
       nuevoControl: { peso: null, altura: null },
       archivos: [],
       showRegistro24h: false,
+      showPlanNutricional: false,
     };
   },
   components: {
     ControlPeriodico,
     Registro24Horas,
+    PlanNutricional,
   },
   mounted() {
     this.obtenerFichas();
   },
   methods: {
+    abrirPlanNutricional() {
+      this.showPlanNutricional = true;
+    },
+    actualizarPlanes() {},
     descargarArchivo(nombreArchivo) {
       const url = `${process.env.VUE_APP_API_URL}/file-manager/${nombreArchivo}`;
       const link = document.createElement("a");
@@ -866,8 +913,26 @@ export default {
   color: white;
 }
 
-.action-button.danger:hover {
+.action-button.control:hover {
   background-color: green;
+}
+
+.action-button.plan {
+  background-color: rgb(0, 245, 73);
+  color: white;
+}
+
+.action-button.plan:hover {
+  background-color: rgb(0, 245, 73);
+}
+
+.action-button.subir {
+  background-color: rgb(0, 225, 255);
+  color: white;
+}
+
+.action-button.subir:hover {
+  background-color: rgb(0, 225, 255);
 }
 
 .action-button.cancel {
