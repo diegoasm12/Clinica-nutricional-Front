@@ -634,9 +634,16 @@ export default {
       }
       return edad;
     },
-    editarFicha() {
-      alert("Redirigir a editar ficha (aún no implementado)");
-    },
+editarFicha() {
+  this.closeModal();
+  const rut = this.fichaSeleccionada.fkUsuario?.rut;
+  if (!rut) return alert("No se puede redirigir sin RUT del paciente");
+
+  this.$router.push({
+    name: 'EditarFicha',
+    params: { id: rut }
+  });
+},
     eliminarFicha() {
       alert("Lógica para eliminar ficha (aún no implementado)");
     },

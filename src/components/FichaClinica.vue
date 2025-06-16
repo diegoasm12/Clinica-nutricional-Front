@@ -289,9 +289,17 @@ export default {
   name: "FichaClinica",
   mounted() {
     this.cargarAlimentos();
+
+    if (this.$route.name === "EditarFicha") {
+      const rut = this.$route.params.id;
+      this.editando = true;
+      this.cargarFichaPorRut(rut);
+    }
   },
   data() {
     return {
+      editando: false,
+      fichaId: null,
       alimentosDisponibles: [],
       form: {
         // Datos paciente
@@ -352,9 +360,73 @@ export default {
       try {
         const res = await axios.get(`${process.env.VUE_APP_API_URL}/alimento`);
         this.alimentosDisponibles = res.data;
-        console.log("alimentos", res);
       } catch (err) {
         console.error("Error cargando alimentos:", err);
+      }
+    },
+
+    async cargarFichaPorRut(rut) {
+      try {
+        const res = await axios.get(`${process.env.VUE_APP_API_URL}/ficha/${rut}`);
+        const ficha = res.data;
+
+        this.fichaId = ficha.id;
+        this.usuarioId = ficha.fkUsuario.id;
+        this.anamnesisSocialId = ficha.fkAnamnesisSocial.id;
+        this.anamnesisAlimentariaId = ficha.fkAnamnesisAlimentaria.id;
+        this.anamnesisClinicaId = ficha.fkAnamnesisClinica.id;
+        this.encuestaId = ficha.fkEncuestaTendenciaConsumo.id;
+
+        this.form.rut = ficha.fkUsuario.rut;
+        this.form.nombre = ficha.fkUsuario.nombre;
+        this.form.email = ficha.fkUsuario.correo;
+        this.form.telefono = ficha.fkUsuario.telefono;
+        this.form.sexo = ficha.fkUsuario.sexo;
+        this.form.fechaNacimiento = ficha.fkUsuario.fechaNacimiento;
+
+        this.form.asisteCon = ficha.fkAnamnesisSocial?.asisteCon || "";
+        this.form.hijos = ficha.fkAnamnesisSocial?.hijos || "";
+        this.form.viveCon = ficha.fkAnamnesisSocial?.viveCon || "";
+        this.form.ocupacion = ficha.fkAnamnesisSocial?.ocupacion || "";
+        this.form.escolaridad = ficha.fkAnamnesisSocial?.escolaridad || "";
+        this.form.redesDeApoyo = ficha.fkAnamnesisSocial?.redesDeApoyo || "";
+        this.form.serviciosBasicos = ficha.fkAnamnesisSocial?.serviciosBasicos || "";
+
+        this.form.alergiaIntolerancia = ficha.fkAnamnesisAlimentaria?.alergiaIntolerancia || "";
+        this.form.alimentoNoGusta = ficha.fkAnamnesisAlimentaria?.alimentoNoGusta || "";
+        this.form.alimentoPreferencia = ficha.fkAnamnesisAlimentaria?.alimentoPreferencia || "";
+        this.form.cocinaEnCasa = ficha.fkAnamnesisAlimentaria?.cocinaEnCasa || "";
+        this.form.habitualmenteComeEn = ficha.fkAnamnesisAlimentaria?.habitualmenteComeEn || "";
+
+        this.form.antecedenteFamiliar = ficha.fkAnamnesisClinica?.antecedenteFamiliar || "";
+        this.form.patologiaBase = ficha.fkAnamnesisClinica?.patologiaBase || "";
+        this.form.medicamento = ficha.fkAnamnesisClinica?.medicamento || "";
+        this.form.anetecedenteQuirurgico = ficha.fkAnamnesisClinica?.anetecedenteQuirurgico || ficha.fkAnamnesisClinica?.antecedenteQuirurgico || "";
+        this.form.alergia = ficha.fkAnamnesisClinica?.alergia || "";
+
+        const signos = ficha.fkAnamnesisClinica?.signosSintomas?.[0] || {};
+        this.form.diuresis = signos.diuresis || "";
+        this.form.apetito = signos.apetito || "";
+        this.form.calambre = signos.calambre || "";
+        this.form.polidipsia = signos.polidipsia || "";
+        this.form.poliuria = signos.poliuria || "";
+        this.form.deposicionBristol = signos.deposicionBristol || "";
+        this.form.tinnitus = signos.tinitus || "";
+        this.form.sudoracionNocturna = signos.sudoracionNocturna || "";
+        this.form.polifagia = signos.polifagia || "";
+        this.form.otroSigno = signos.otro || "";
+
+        const habitos = ficha.fkAnamnesisClinica?.habitos?.[0] || {};
+        this.form.alcohol = habitos.alcohol || "";
+        this.form.droga = habitos.droga || "";
+        this.form.actividadFisica = habitos.actividadFisica || "";
+
+        this.form.encuestaConsumo = ficha.fkEncuestaTendenciaConsumo?.rEncuestaTendenciaConsumoAlimento?.map(item => ({
+          fkAlimento_id: item.fkAlimento?.id,
+          cuantosDiasSemana: item.cuantosDiasSemana
+        })) || [];
+      } catch (error) {
+        console.error("Error al cargar ficha para edición:", error);
       }
     },
 
@@ -368,13 +440,11 @@ export default {
     quitarAlimento(index) {
       this.form.encuestaConsumo.splice(index, 1);
     },
+
     async handleSubmit() {
       try {
-        const fechaFormateada = new Date(
-          this.form.fechaNacimiento
-        ).toISOString();
+        const fechaFormateada = new Date(this.form.fechaNacimiento).toISOString();
 
-        // 1. Crear usuario
         const usuarioPayload = {
           rut: this.form.rut,
           nombre: this.form.nombre,
@@ -382,20 +452,18 @@ export default {
           telefono: this.form.telefono,
           sexo: this.form.sexo,
           fechaNacimiento: fechaFormateada,
-          rRolUsuario: { fkRol_id: 2 },
         };
 
-        const resUsuario = await axios.post(
-          `${process.env.VUE_APP_API_URL}/usuario`,
-          usuarioPayload
-        );
-        const usuarioId = resUsuario.data.id;
-        console.log("respuesta crear usuario", resUsuario);
+        if (this.editando) {
+          // PUTs
+        } else {
+          const resUsuario = await axios.post(`${process.env.VUE_APP_API_URL}/usuario`, {
+            ...usuarioPayload,
+            rRolUsuario: { fkRol_id: 2 },
+          });
+          const usuarioId = resUsuario.data.id;
 
-        // 2. Crear anamnesis social
-        const resAnamnesisSocial = await axios.post(
-          `${process.env.VUE_APP_API_URL}/anamnesis-social`,
-          {
+          const resAnamnesisSocial = await axios.post(`${process.env.VUE_APP_API_URL}/anamnesis-social`, {
             asisteCon: this.form.asisteCon,
             hijos: this.form.hijos,
             viveCon: this.form.viveCon,
@@ -403,31 +471,17 @@ export default {
             escolaridad: this.form.escolaridad,
             redesDeApoyo: this.form.redesDeApoyo,
             serviciosBasicos: this.form.serviciosBasicos,
-          }
-        );
+          });
 
-        console.log("respuesta crear amanan social", resAnamnesisSocial);
-
-        // 3. Crear anamnesis alimentaria
-        const resAnamnesisAlimentaria = await axios.post(
-          `${process.env.VUE_APP_API_URL}/anamnesis-alimentaria`,
-          {
+          const resAnamnesisAlimentaria = await axios.post(`${process.env.VUE_APP_API_URL}/anamnesis-alimentaria`, {
             alergiaIntolerancia: this.form.alergiaIntolerancia,
             alimentoNoGusta: this.form.alimentoNoGusta,
             alimentoPreferencia: this.form.alimentoPreferencia,
             cocinaEnCasa: this.form.cocinaEnCasa,
             habitualmenteComeEn: this.form.habitualmenteComeEn,
-          }
-        );
-        console.log(
-          "respuesta crear amanan alimentaria",
-          resAnamnesisAlimentaria
-        );
+          });
 
-        // 4. Crear anamnesis clínica
-        const resAnamnesisClinica = await axios.post(
-          `${process.env.VUE_APP_API_URL}/anamnesis-clinica`,
-          {
+          const resAnamnesisClinica = await axios.post(`${process.env.VUE_APP_API_URL}/anamnesis-clinica`, {
             antecedenteFamiliar: this.form.antecedenteFamiliar,
             patologiaBase: this.form.patologiaBase,
             medicamento: this.form.medicamento,
@@ -450,56 +504,38 @@ export default {
               droga: this.form.droga,
               actividadFisica: this.form.actividadFisica,
             },
-          }
-        );
+          });
 
-        console.log("respuesta crear amanan clinica", resAnamnesisClinica);
-
-        // 5. Crear encuesta de tendencia consumo (esto ahora sí antes de la ficha)
-        const encuestaPayload = {
-          rEncuestaTendenciaConsumoAlimentos: this.form.encuestaConsumo.map(
-            (item) => ({
+          const encuestaPayload = {
+            rEncuestaTendenciaConsumoAlimentos: this.form.encuestaConsumo.map((item) => ({
               fkAlimento_id: item.fkAlimento_id,
               cuantosDiasSemana: item.cuantosDiasSemana.toString(),
-            })
-          ),
-        };
+            })),
+          };
 
-        const resEncuesta = await axios.post(
-          `${process.env.VUE_APP_API_URL}/encuesta-tendencia-consumo`,
-          encuestaPayload
-        );
+          const resEncuesta = await axios.post(`${process.env.VUE_APP_API_URL}/encuesta-tendencia-consumo`, encuestaPayload);
 
-        console.log("payload encuesta", encuestaPayload);
-        console.log("respuesta crear encuesta alimentcia", resEncuesta);
+          await axios.post(`${process.env.VUE_APP_API_URL}/ficha`, {
+            fkUsuario_id: usuarioId,
+            fkAnamnesisSocial_id: resAnamnesisSocial.data.id,
+            fkAnamnesisClinica_id: resAnamnesisClinica.data.id,
+            fkAnamnesisAlimentaria_id: resAnamnesisAlimentaria.data.id,
+            fkEncuestaTendenciaConsumo_id: resEncuesta.data.id,
+          });
 
-        const encuestaId = resEncuesta.data.id;
-
-        // 6. Finalmente crear la ficha incluyendo el id de encuesta
-        const fichaPayload = {
-          fkUsuario_id: usuarioId,
-          fkAnamnesisSocial_id: resAnamnesisSocial.data.id,
-          fkAnamnesisClinica_id: resAnamnesisClinica.data.id,
-          fkAnamnesisAlimentaria_id: resAnamnesisAlimentaria.data.id,
-          fkEncuestaTendenciaConsumo_id: encuestaId,
-        };
-
-        const resFicha = await axios.post(
-          `${process.env.VUE_APP_API_URL}/ficha`,
-          fichaPayload
-        );
-
-        console.log("payload ficha", fichaPayload);
-        console.log("respuesta crear ficha", resFicha);
-        alert("✅ Ficha creada correctamente");
+          alert("✅ Ficha creada correctamente");
+        }
       } catch (error) {
         console.error(error);
-        alert("❌ Error al guardar");
+        alert("❌ Error al guardar la ficha");
       }
     },
   },
 };
 </script>
+
+
+
 
 <style scoped>
 .consulta-container {
