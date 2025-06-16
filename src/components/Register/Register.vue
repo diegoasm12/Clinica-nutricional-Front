@@ -176,7 +176,7 @@ export default {
         correo: this.email,
         sexo: this.sexo,
         rRolUsuario: {
-          fkRol_id: 2, // Paciente
+          fkRol_id: 1, // Paciente
         },
       };
       console.log(payload);

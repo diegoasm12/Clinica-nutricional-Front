@@ -479,32 +479,35 @@
         </div>
 
         <div class="modal-footer">
-          <button @click="editarFicha" class="action-button secondary">
-            Editar ficha
-          </button>
-          <button @click="eliminarFicha" class="action-button danger">
-            Eliminar ficha
-          </button>
-          <button @click="abrirAntropometria" class="action-button control">
-            Agregar Antropometría
-          </button>
-          <button @click="abrirRegistro24h" class="action-button history">
-            Registro 24 Horas
-          </button>
-          <button @click="abrirPlanNutricional" class="action-button plan">
-            Agregar Plan Nutricional
-          </button>
+          <!-- Botones solo para Nutricionista -->
+          <template v-if="userRole === 'Nutricionista'">
+            <button @click="editarFicha" class="action-button secondary">
+              Editar ficha
+            </button>
+            <button @click="eliminarFicha" class="action-button danger">
+              Eliminar ficha
+            </button>
+            <button @click="abrirAntropometria" class="action-button control">
+              Agregar Antropometría
+            </button>
+            <button @click="abrirRegistro24h" class="action-button history">
+              Registro 24 Horas
+            </button>
+            <button @click="abrirPlanNutricional" class="action-button plan">
+              Agregar Plan Nutricional
+            </button>
+            <button @click="subirExamen" class="action-button subir">
+              Subir Examen
+            </button>
+            <input
+              ref="inputFile"
+              type="file"
+              style="display: none"
+              @change="manejarArchivoSeleccionado"
+            />
+          </template>
 
-          <button @click="subirExamen" class="action-button subir">
-            Subir Examen
-          </button>
-
-          <input
-            ref="inputFile"
-            type="file"
-            style="display: none"
-            @change="manejarArchivoSeleccionado"
-          />
+          <!-- Botón cerrar disponible para todos -->
           <button @click="closeModal" class="action-button cancel">
             Cerrar
           </button>
@@ -568,7 +571,33 @@ export default {
   mounted() {
     this.obtenerFichas();
   },
+  computed: {
+    userRole() {
+      return this.getUserRole();
+    },
+  },
   methods: {
+    getToken() {
+      return localStorage.getItem("token") || "";
+    },
+
+    getUserRole() {
+      const token = this.getToken();
+      if (!token) return null;
+
+      const payload = token.split(".")[1];
+      const base = decodeURIComponent(
+        Array.prototype.map
+          .call(atob(payload), function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join("")
+      );
+
+      const parsed = JSON.parse(base);
+      return parsed.rols?.[0]?.rol || null;
+    },
+
     abrirPlanNutricional() {
       this.showPlanNutricional = true;
     },
