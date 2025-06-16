@@ -6,57 +6,54 @@
           <h2>Resumen del Paciente</h2>
           <button @click="cerrar" class="boton-cerrar">&times;</button>
         </div>
-        
+
         <div class="modal-body">
           <div class="info-paciente">
-            <h3 class="alerta" :class="getAlertaClass(paciente.alerta)">{{ paciente.alerta }}</h3>
+            <h3 class="alerta" :class="getAlertaClass(paciente.alerta)">
+              {{ paciente.alerta }}
+            </h3>
             <h3>{{ paciente.nombre }}</h3>
             <p>RUT: {{ paciente.rut }}</p>
           </div>
-          
+
           <div class="datos-clave">
             <div class="dato-clave">
               <span class="dato-titulo">Peso actual</span>
-              <span class="dato-valor">{{ paciente.peso }} kg</span>
-              <span class="dato-tendencia" :class="tendenciaPeso.clase">
-                {{ tendenciaPeso.texto }}
-              </span>
+              <p class="text-dark valor">
+                {{ paciente.peso ? paciente.peso + " kg" : "Sin datos" }}
+              </p>
             </div>
-            
+
             <div class="dato-clave">
               <span class="dato-titulo">IMC</span>
-              <span class="dato-valor">{{ paciente.imc }}</span>
+              <p class="valor">{{ paciente.imc || "No calculado" }}</p>
               <span class="dato-clasificacion">{{ clasificacionIMC }}</span>
             </div>
-            
+
             <div class="dato-clave">
               <span class="dato-titulo">Diagnóstico</span>
-              <span class="dato-valor">{{ paciente.diagnostico }}</span>
+              <span class="dato-valor">{{ diagnosticoAutomatico }}</span>
             </div>
-            
+
             <div class="dato-clave">
               <span class="dato-titulo">Último control</span>
-              <span class="dato-valor">{{ formatoFecha(paciente.ultimaVisita) }}</span>
-            </div>
-          </div>
-          
-          <div class="grafico-evolucion">
-            <h4>Evolución de peso</h4>
-            <div class="grafico-placeholder">
-              <!-- Aquí iría un gráfico real en implementación completa -->
-              <p>Gráfico de evolución de peso</p>
+              <span class="dato-valor">{{
+                formatoFecha(paciente.ultimaVisita)
+              }}</span>
             </div>
           </div>
         </div>
-        
+
         <div class="modal-footer">
           <button @click="cerrar" class="boton-secundario">Cerrar</button>
-          <button @click="abrirHistorial" class="boton-primario">Ver Historial Completo</button>
+          <!-- <button @click="abrirHistorial" class="boton-primario">
+            Ver Historial Completo
+          </button> -->
         </div>
       </div>
     </div>
-    
-    <HistorialClinico 
+
+    <HistorialClinico
       v-if="mostrarHistorial"
       :paciente-id="paciente.id"
       @cerrar="cerrarHistorial"
@@ -65,59 +62,52 @@
 </template>
 
 <script>
-import HistorialClinico from '@/components/HistorialClinico.vue';
+import HistorialClinico from "@/components/HistorialClinico.vue";
 
 export default {
   components: {
-    HistorialClinico
+    HistorialClinico,
   },
   props: {
     paciente: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
-      mostrarHistorial: false
-    }
+      mostrarHistorial: false,
+    };
   },
   computed: {
-    tendenciaPeso() {
-      if (!this.paciente.historial || this.paciente.historial.length < 2) {
-        return { texto: 'Sin datos previos', clase: 'neutral' };
-      }
-      
-      const ultimoPeso = this.paciente.peso;
-      const penultimoPeso = this.paciente.historial[1].peso;
-      const diferencia = ultimoPeso - penultimoPeso;
-      
-      if (diferencia > 0) {
-        return { texto: `+${diferencia.toFixed(1)} kg`, clase: 'aumento' };
-      } else if (diferencia < 0) {
-        return { texto: `${diferencia.toFixed(1)} kg`, clase: 'disminucion' };
-      } else {
-        return { texto: 'Sin cambio', clase: 'neutral' };
-      }
-    },
     clasificacionIMC() {
       const imc = parseFloat(this.paciente.imc);
-      if (!imc) return 'No calculado';
-      
-      if (imc < 18.5) return 'Bajo peso';
-      if (imc < 25) return 'Normal';
-      if (imc < 30) return 'Sobrepeso';
-      if (imc < 35) return 'Obesidad I';
-      if (imc < 40) return 'Obesidad II';
-      return 'Obesidad III';
-    }
+      if (!imc) return "No calculado";
+
+      if (imc < 18.5) return "Bajo peso";
+      if (imc < 25) return "Normal";
+      if (imc < 30) return "Sobrepeso";
+      if (imc < 35) return "Obesidad I";
+      if (imc < 40) return "Obesidad II";
+      return "Obesidad III";
+    },
+    diagnosticoAutomatico() {
+      const imc = parseFloat(this.paciente.imc);
+      if (!imc) return "Sin datos suficientes";
+
+      if (imc >= 18.5 && imc <= 24.9) {
+        return "Buen seguimiento";
+      } else {
+        return "Requiere seguimiento";
+      }
+    },
   },
   methods: {
     formatoFecha(fecha) {
-      return new Date(fecha).toLocaleDateString('es-CL');
+      return new Date(fecha).toLocaleDateString("es-CL");
     },
     cerrar() {
-      this.$emit('cerrar');
+      this.$emit("cerrar");
     },
     abrirHistorial() {
       this.mostrarHistorial = true;
@@ -126,21 +116,33 @@ export default {
       this.mostrarHistorial = false;
     },
     getAlertaClass(alerta) {
-    if (!alerta) return '';
-    
-    alerta = alerta.toLowerCase();
-    
-    if (alerta.includes('crítico') || alerta.includes('urgente') || alerta.includes('peligro')) {
-      return 'alerta-roja';
-    } else if (alerta.includes('estable') || alerta.includes('normal') || alerta.includes('bien')) {
-      return 'alerta-verde';
-    } else if (alerta.includes('atención') || alerta.includes('cuidado') || alerta.includes('observación')) {
-      return 'alerta-amarilla';
-    }
-    return '';
-  }
-  }
-}
+      if (!alerta) return "";
+
+      alerta = alerta.toLowerCase();
+
+      if (
+        alerta.includes("crítico") ||
+        alerta.includes("urgente") ||
+        alerta.includes("peligro")
+      ) {
+        return "alerta-roja";
+      } else if (
+        alerta.includes("estable") ||
+        alerta.includes("normal") ||
+        alerta.includes("bien")
+      ) {
+        return "alerta-verde";
+      } else if (
+        alerta.includes("atención") ||
+        alerta.includes("cuidado") ||
+        alerta.includes("observación")
+      ) {
+        return "alerta-amarilla";
+      }
+      return "";
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -283,7 +285,8 @@ export default {
   color: #2c3e50;
 }
 
-.dato-tendencia, .dato-clasificacion {
+.dato-tendencia,
+.dato-clasificacion {
   display: block;
   font-size: 0.85rem;
   margin-top: 0.5rem;
@@ -365,12 +368,13 @@ export default {
   .datos-clave {
     grid-template-columns: 1fr;
   }
-  
+
   .modal-footer {
     flex-direction: column-reverse;
   }
-  
-  .boton-primario, .boton-secundario {
+
+  .boton-primario,
+  .boton-secundario {
     width: 100%;
   }
 }

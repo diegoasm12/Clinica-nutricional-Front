@@ -1,61 +1,63 @@
 <template>
   <div class="pacientes-container">
     <div class="pacientes-content">
-        <div v-if="mostrarNotificacion" class="notificacion" :class="tipoNotificacion">
-            {{ mensajeNotificacion }}
-        </div>
+      <div
+        v-if="mostrarNotificacion"
+        class="notificacion"
+        :class="tipoNotificacion"
+      >
+        {{ mensajeNotificacion }}
+      </div>
       <h1 class="form-title">Listado de Pacientes</h1>
-      
+
       <div class="form-section">
-        <h2 class="section-title">Buscar por nombre o RUT</h2>
+        <h2 class="section-title">Buscar por RUT</h2>
         <div class="form-group">
-          <label class="form-label">Ingrese nombre o RUT</label>
-          <input 
-            v-model="busqueda" 
-            placeholder="Ej: María Fernández o 12.345.678-9" 
+          <label class="form-label">Ingrese RUT</label>
+          <input
+            v-model="busqueda"
+            placeholder="12.345.678-9"
             class="form-input"
             @input="filtrarPacientes"
-          >
+          />
         </div>
       </div>
-      
+
       <div v-if="cargando" class="loading-state">
         <p>Cargando pacientes...</p>
       </div>
-      
+
       <div v-else-if="pacientesFiltrados.length === 0" class="empty-state">
         <p>No se encontraron pacientes</p>
       </div>
-      
+
       <div v-else class="patients-list">
-        <div 
-          v-for="paciente in pacientesFiltrados" 
-          :key="paciente.id" 
+        <div
+          v-for="paciente in pacientesFiltrados"
+          :key="paciente.id"
           class="patient-card"
         >
           <div class="patient-info">
             <h3>{{ paciente.nombre }}</h3>
             <div class="patient-details">
-              <span class="detail-label">RUT:</span>
-              <span>{{ formatoRUT(paciente.rut) }}</span>
+              <span class="detail-label">Rut:</span>
+              <span>{{ paciente.rut }}</span>
             </div>
+
             <div class="patient-details">
-              <span class="detail-label">Última visita:</span>
-              <span>{{ formatoFecha(paciente.ultimaVisita) }}</span>
+              <span class="detail-label">Fecha nacimiento:</span>
+              <span>{{ formatoFecha(paciente.fechaNacimiento) }}</span>
             </div>
           </div>
-          <button 
-            @click="mostrarResumen(paciente)" 
-            class="submit-button"
-          >
+          <button @click="mostrarResumen(paciente)" class="submit-button">
             Ver Resumen
           </button>
         </div>
       </div>
     </div>
-    
-    <ResumenPaciente 
-      v-if="mostrarModalResumen" 
+
+    <ResumenPaciente
+      v-if="mostrarModalResumen"
       :paciente="pacienteSeleccionado"
       @cerrar="mostrarModalResumen = false"
     />
@@ -63,128 +65,136 @@
 </template>
 
 <script>
-import ResumenPaciente from './ResumenPaciente.vue';
+import ResumenPaciente from "./ResumenPaciente.vue";
 
 export default {
   components: {
-    ResumenPaciente
+    ResumenPaciente,
   },
   data() {
     return {
-      busqueda: '',
+      busqueda: "",
       cargando: false,
       pacientes: [],
       pacientesFiltrados: [],
       pacienteSeleccionado: null,
       mostrarModalResumen: false,
       mostrarNotificacion: false,
-      mensajeNotificacion: '',
-      tipoNotificacion: 'info', // puede ser 'info', 'exito', 'error' (porsiacaso)
-      timeoutNotificacion: null
-    }
+      mensajeNotificacion: "",
+      tipoNotificacion: "info", // puede ser 'info', 'exito', 'error' (porsiacaso)
+      timeoutNotificacion: null,
+    };
   },
   created() {
     this.cargarPacientes();
   },
   methods: {
-    mostrarNotificacionTemporal(mensaje, tipo = 'info', duracion = 3000) {
-        // Cancelar notificación previa si existe
-        if (this.timeoutNotificacion) {
-        clearTimeout(this.timeoutNotificacion);
-        }
-        
-        this.mostrarNotificacion = true;
-        this.mensajeNotificacion = mensaje;
-        this.tipoNotificacion = tipo;
-        
-        // Ocultar después de la duración especificada
-        this.timeoutNotificacion = setTimeout(() => {
-        this.mostrarNotificacion = false;
-        }, duracion);
-    },
     async cargarPacientes() {
       this.cargando = true;
       try {
-        // Simulación de datos - reemplazar con API real
-        this.pacientes = [
-          {
-            id: 1,
-            nombre: 'María Fernández López',
-            rut: '187654321',
-            ultimaVisita: '2023-06-15',
-            peso: 57.8,
-            altura: 162,
-            diagnostico: 'Sobrepeso leve',
-            imc: 21.9,
-            historial: [
-              { fecha: '2023-06-15', tipo: 'control', peso: 57.8 },
-              { fecha: '2023-05-20', tipo: 'consulta', peso: 58.3 }
-            ],
-            alerta: 'Peso Crítico ⚠️'
-          },
-          {
-            id: 2,
-            nombre: 'Juan Pérez González',
-            rut: '123456789',
-            ultimaVisita: '2023-07-10',
-            peso: 75.2,
-            altura: 175,
-            diagnostico: 'Normopeso',
-            imc: 24.5,
-            alerta: 'Peso estable ✅'
+        const response = await fetch(`${process.env.VUE_APP_API_URL}/ficha`);
+        const data = await response.json();
+
+        this.pacientes = data.map((ficha) => {
+          const usuario = ficha.fkUsuario;
+
+          // Si tiene antropometrias, tomamos el último control
+          let ultimaAntropometria = null;
+          if (ficha.antropometrias && ficha.antropometrias.length > 0) {
+            // Ordenamos para asegurarnos (opcional)
+            ficha.antropometrias.sort(
+              (a, b) => new Date(b.fechaCreacion) - new Date(a.fechaCreacion)
+            );
+            ultimaAntropometria = ficha.antropometrias[0];
           }
-        ];
+
+          return {
+            id: ficha.id,
+            nombre: usuario.nombre,
+            rut: usuario.rut.toString(),
+            fechaNacimiento: usuario.fechaNacimiento,
+            telefono: usuario.telefono,
+            correo: usuario.correo,
+            sexo: usuario.sexo,
+
+            // Datos de control
+            peso: ultimaAntropometria?.peso || null,
+            imc: ultimaAntropometria?.imc || null,
+            ultimaVisita:
+              ultimaAntropometria?.fechaCreacion || ficha.fechaCreacion,
+          };
+        });
+
         this.pacientesFiltrados = [...this.pacientes];
       } catch (error) {
-        console.error('Error al cargar pacientes:', error);
+        console.error("Error al cargar pacientes:", error);
+        this.mostrarNotificacionTemporal("Error al cargar pacientes", "error");
       } finally {
         this.cargando = false;
       }
     },
+
+    mostrarNotificacionTemporal(mensaje, tipo = "info", duracion = 3000) {
+      // Cancelar notificación previa si existe
+      if (this.timeoutNotificacion) {
+        clearTimeout(this.timeoutNotificacion);
+      }
+
+      this.mostrarNotificacion = true;
+      this.mensajeNotificacion = mensaje;
+      this.tipoNotificacion = tipo;
+
+      // Ocultar después de la duración especificada
+      this.timeoutNotificacion = setTimeout(() => {
+        this.mostrarNotificacion = false;
+      }, duracion);
+    },
+
     filtrarPacientes() {
       const termino = this.busqueda.toLowerCase();
-      this.pacientesFiltrados = this.pacientes.filter(p => 
-        p.nombre.toLowerCase().includes(termino) || 
-        p.rut.includes(termino.replace(/[^0-9kK]/g, ''))
+      this.pacientesFiltrados = this.pacientes.filter(
+        (p) =>
+          p.nombre.toLowerCase().includes(termino) ||
+          p.rut.includes(termino.replace(/[^0-9kK]/g, ""))
       );
     },
     formatoFecha(fecha) {
-      if (!fecha) return 'N/A';
-      const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-      return new Date(fecha).toLocaleDateString('es-CL', options);
+      if (!fecha) return "N/A";
+      const options = { day: "2-digit", month: "2-digit", year: "numeric" };
+      return new Date(fecha).toLocaleDateString("es-CL", options);
     },
     formatoRUT(rut) {
-      if (!rut) return '';
-      const rutLimpio = rut.toString().replace(/[^0-9kK]/g, '');
+      if (!rut) return "";
+      const rutLimpio = rut.toString().replace(/[^0-9kK]/g, "");
       if (rutLimpio.length <= 1) return rutLimpio;
-      
+
       const cuerpo = rutLimpio.slice(0, -1);
       const dv = rutLimpio.slice(-1).toUpperCase();
-      
-      return cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + dv;
+
+      return cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "-" + dv;
     },
     mostrarResumen(paciente) {
       this.pacienteSeleccionado = paciente;
       this.mostrarModalResumen = true;
-    }
+    },
   },
   mounted() {
     // Mostrar notificación al cargar el componente
     if (this.pacientes.length > 0) {
-        const ultimoPaciente = this.pacientes[0]; 
-        this.mostrarNotificacionTemporal(
+      const ultimoPaciente = this.pacientes[0];
+      this.mostrarNotificacionTemporal(
         `La ficha de ${ultimoPaciente.nombre} ha sido evaluada`,
-        'exito'
-        );
+        "exito"
+      );
     }
-    
+
     // para paciente específico que fue evaluado ejemplo
     // this.mostrarNotificacionTemporal(
     //   `La ficha de María Fernández López ha sido evaluada`,
     //   'exito'
     // );
-    }
-}
+  },
+};
 </script>
 
 <style scoped>
@@ -293,7 +303,8 @@ export default {
   box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
 }
 
-.loading-state, .empty-state {
+.loading-state,
+.empty-state {
   text-align: center;
   padding: 2rem;
   color: #4a5568;
