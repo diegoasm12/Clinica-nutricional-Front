@@ -1,7 +1,11 @@
 <template>
   <div class="gestion-container">
     <div class="gestion-content">
-      <div v-if="mostrarNotificacion" class="notificacion" :class="tipoNotificacion">
+      <div
+        v-if="mostrarNotificacion"
+        class="notificacion"
+        :class="tipoNotificacion"
+      >
         {{ mensajeNotificacion }}
       </div>
 
@@ -11,12 +15,12 @@
         <h2 class="section-title">Buscar por nombre o email</h2>
         <div class="form-group">
           <label class="form-label">Ingrese nombre o email</label>
-          <input 
-            v-model="busqueda" 
-            placeholder="Ej: juan.perez@empresa.cl" 
+          <input
+            v-model="busqueda"
+            placeholder="Ej: juan.perez@empresa.cl"
             class="form-input"
             @input="filtrarUsuarios"
-          >
+          />
         </div>
       </div>
 
@@ -29,7 +33,11 @@
       </div>
 
       <div v-else class="users-list">
-        <div v-for="usuario in usuariosFiltrados" :key="usuario.id" class="user-card">
+        <div
+          v-for="usuario in usuariosFiltrados"
+          :key="usuario.id"
+          class="user-card"
+        >
           <div class="user-info">
             <h3>{{ usuario.nombre }}</h3>
             <div class="user-details">
@@ -45,7 +53,55 @@
               <span>{{ formatoFecha(usuario.ultimoAcceso) }}</span>
             </div>
           </div>
-          <button class="submit-button" @click="editarUsuario(usuario)">Editar Usuario</button>
+          <button class="submit-button" @click="editarUsuario(usuario)">
+            Editar Usuario
+          </button>
+        </div>
+      </div>
+    </div>
+    <div v-if="mostrarModal" class="modal-overlay" @click.self="cerrarModal">
+      <div class="modal-content">
+        <h2>Editar Usuario</h2>
+
+        <div class="form-group">
+          <label>Nombre:</label>
+          <input v-model="usuarioEdit.nombre" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Correo:</label>
+          <input v-model="usuarioEdit.correo" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Teléfono:</label>
+          <input
+            v-model="usuarioEdit.telefono"
+            class="form-input"
+            type="number"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>RUT:</label>
+          <input v-model="usuarioEdit.rut" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Sexo:</label>
+          <select v-model="usuarioEdit.sexo" class="form-input">
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+          </select>
+        </div>
+
+        <div class="form-buttons">
+          <button class="submit-button" @click="guardarEdicionUsuario">
+            Guardar Cambios
+          </button>
+          <button class="submit-button cancel" @click="cerrarModal">
+            Cancelar
+          </button>
         </div>
       </div>
     </div>
@@ -54,61 +110,135 @@
 
 <script>
 export default {
-  name: 'GestionUsuarios',
+  name: "GestionUsuarios",
   data() {
     return {
-      busqueda: '',
+      busqueda: "",
       cargando: false,
       usuarios: [],
       usuariosFiltrados: [],
       mostrarNotificacion: false,
-      mensajeNotificacion: '',
-      tipoNotificacion: 'info',
-      timeoutNotificacion: null
-    }
+      mensajeNotificacion: "",
+      tipoNotificacion: "info",
+      timeoutNotificacion: null,
+      mostrarModal: false,
+      usuarioEdit: {
+        id: null,
+        nombre: "",
+        correo: "",
+        telefono: "",
+        rut: "",
+        sexo: "",
+      },
+    };
   },
   created() {
-    this.cargarUsuarios()
+    this.cargarUsuarios();
   },
   methods: {
-    mostrarNotificacionTemporal(mensaje, tipo = 'info', duracion = 3000) {
-      if (this.timeoutNotificacion) clearTimeout(this.timeoutNotificacion)
-      this.mostrarNotificacion = true
-      this.mensajeNotificacion = mensaje
-      this.tipoNotificacion = tipo
-      this.timeoutNotificacion = setTimeout(() => {
-        this.mostrarNotificacion = false
-      }, duracion)
+    editarUsuario(usuario) {
+      this.usuarioEdit = {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        correo: usuario.email,
+        telefono: usuario.telefono || "",
+        rut: usuario.rut || "",
+        sexo: usuario.sexo || "M",
+      };
+      this.mostrarModal = true;
     },
-    cargarUsuarios() {
-      this.cargando = true
-      // Simulación de carga
-      setTimeout(() => {
-        this.usuarios = [
-          { id: 1, nombre: 'Diego Soto', email: 'diego@demo.com', rol: 'Admin', ultimoAcceso: '2025-05-24' },
-          { id: 2, nombre: 'Juan Mella', email: 'juan@demo.com', rol: 'Nutricionista', ultimoAcceso: '2025-05-23' },
-          { id: 3, nombre: 'Fernando Lucena', email: 'fernando@demo.com', rol: 'Asistente', ultimoAcceso: '2025-05-22' }
-        ]
-        this.usuariosFiltrados = [...this.usuarios]
-        this.cargando = false
-      }, 800)
+    async guardarEdicionUsuario() {
+      try {
+        const payload = {
+          nombre: this.usuarioEdit.nombre,
+          correo: this.usuarioEdit.correo,
+          telefono: Number(this.usuarioEdit.telefono),
+          rut: this.usuarioEdit.rut,
+          sexo: this.usuarioEdit.sexo,
+        };
+
+        await fetch(
+          `${process.env.VUE_APP_API_URL}/usuario/${this.usuarioEdit.id}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        this.mostrarNotificacionTemporal(
+          "Usuario actualizado correctamente",
+          "success"
+        );
+        alert("Usuario actualizado correctamente");
+
+        this.mostrarModal = false;
+        this.cargarUsuarios(); // Recarga la lista completa
+      } catch (error) {
+        console.error("Error al actualizar usuario:", error);
+        this.mostrarNotificacionTemporal(
+          "Error al actualizar usuario",
+          "error"
+        );
+      }
+    },
+    cerrarModal() {
+      this.mostrarModal = false;
+    },
+    async cargarUsuarios() {
+      this.cargando = true;
+      try {
+        const response = await fetch(`${process.env.VUE_APP_API_URL}/usuario`);
+        const data = await response.json();
+
+        // Transformar los usuarios según el formato esperado en tu lista
+        this.usuarios = data.map((usuario) => ({
+          id: usuario.id,
+          nombre: usuario.nombre,
+          email: usuario.correo,
+          rol: usuario.rRolUsuario?.[0]?.fkRol?.rol || "Sin rol asignado",
+          ultimoAcceso: usuario.fechaNacimiento,
+          telefono: usuario.telefono || "",
+          rut: usuario.rut || "",
+          sexo: usuario.sexo || "",
+        }));
+
+        this.usuariosFiltrados = [...this.usuarios];
+      } catch (error) {
+        console.error("Error al cargar usuarios:", error);
+        this.mostrarNotificacionTemporal("Error al cargar usuarios", "error");
+      } finally {
+        this.cargando = false;
+      }
+    },
+
+    mostrarNotificacionTemporal(mensaje, tipo = "info", duracion = 3000) {
+      if (this.timeoutNotificacion) clearTimeout(this.timeoutNotificacion);
+      this.mostrarNotificacion = true;
+      this.mensajeNotificacion = mensaje;
+      this.tipoNotificacion = tipo;
+      this.timeoutNotificacion = setTimeout(() => {
+        this.mostrarNotificacion = false;
+      }, duracion);
     },
     filtrarUsuarios() {
-      const termino = this.busqueda.toLowerCase()
-      this.usuariosFiltrados = this.usuarios.filter(u =>
-        u.nombre.toLowerCase().includes(termino) ||
-        u.email.toLowerCase().includes(termino)
-      )
+      const termino = this.busqueda.toLowerCase();
+      this.usuariosFiltrados = this.usuarios.filter(
+        (u) =>
+          u.nombre.toLowerCase().includes(termino) ||
+          u.email.toLowerCase().includes(termino)
+      );
     },
     formatoFecha(fecha) {
-      if (!fecha) return 'N/A'
-      return new Date(fecha).toLocaleDateString('es-CL', { year: 'numeric', month: '2-digit', day: '2-digit' })
+      if (!fecha) return "N/A";
+      return new Date(fecha).toLocaleDateString("es-CL", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      });
     },
-    editarUsuario(usuario) {
-      this.$router.push({ name: 'EditarUsuario', params: { id: usuario.id } })
-    }
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
@@ -222,5 +352,43 @@ export default {
 .submit-button:hover {
   background-color: #9e4fb0;
   transform: translateY(-2px);
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: #1a202c;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem; /* separación uniforme entre botones */
+  margin-top: 1.5rem;
+}
+
+button.cancel {
+  background-color: #718096;
+}
+
+button.cancel:hover {
+  background-color: #4a5568;
+}
+button.submit-button {
+  width: 150px;
 }
 </style>
