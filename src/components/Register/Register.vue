@@ -105,6 +105,16 @@
             />
           </div>
 
+          <!-- Selección de Rol -->
+          <div class="mb-4 w-100">
+            <label class="form-label mb-2 fs-5 fw-medium">Rol</label>
+            <select class="text-dark form-control" v-model="fkRol_id" required>
+              <option disabled value="">Seleccione un rol</option>
+              <option value="3">Administrador</option>
+              <option value="1">Nutricionista</option>
+            </select>
+          </div>
+
           <hr class="my-4 text-gray-300" />
 
           <button
@@ -144,6 +154,7 @@ export default {
       telefono: "",
       sexo: "",
       fechaNacimiento: "",
+      fkRol_id: "",
     };
   },
   methods: {
@@ -176,7 +187,7 @@ export default {
         correo: this.email,
         sexo: this.sexo,
         rRolUsuario: {
-          fkRol_id: 1, // Paciente
+          fkRol_id: parseInt(this.fkRol_id),
         },
       };
       console.log(payload);
@@ -188,7 +199,7 @@ export default {
         console.log(payload);
         if (response.status === 201) {
           alert("Cuenta creada con éxito");
-          this.$router.push("/login");
+          this.$router.push("/admin/gestionusuarios");
         }
       } catch (error) {
         console.error(error);
